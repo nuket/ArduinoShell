@@ -1,7 +1,28 @@
+/**
+    Copyright (c) 2015 Max Vilimpoc
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+*/
+
 #include <EEPROM.h>
 #include <string.h>
 
-// I hate the preprocessor and Arduino's scoping in sketches.
 #define EEPROM_ROW_LENGTH 16
 #define OUTPUT_ROW_LENGTH 80
 
@@ -12,12 +33,21 @@ struct EepromRow
 
 bool is_ascii(char c)
 {
-    if ('a' <= c && c <= 'z') return true;
-    if ('A' <= c && c <= 'Z') return true;
+    // if ('a' <= c && c <= 'z') return true;
+    // if ('A' <= c && c <= 'Z') return true;
+    if (0x20 <= c && c <= 0x7e) return true;
 
     return false;
 }
 
+/**
+ * Prints the contents of EEPROM from startAddress to startAddress + length.
+ * 
+ * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
+ * 
+ * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
+ * to the next-lower block size.
+ */
 void printEepromContents(uint32_t startAddress, uint32_t length)
 {
     uint16_t  rows = length / EEPROM_ROW_LENGTH;
@@ -71,11 +101,11 @@ void printEepromContents(uint32_t startAddress, uint32_t length)
 }
 
 void setup() 
-{   
-    Serial.begin(57600);
+{
+    Serial.begin(115200);
 
-    Serial.println("EEPROM Test");
-    Serial.println("(c) 2015 Max Vilimpoc, all rights reserved");
+    Serial.println("EEPROM Shell");
+    Serial.println("(c) 2015 Max Vilimpoc (https://github.com/nuket/eeprom-shell), MIT licensed.");
     Serial.println("");
 
     Serial.print("Size of EEPROM: ");
@@ -87,8 +117,9 @@ void setup()
 
 void loop() 
 {
-    // put your main code here, to run repeatedly:
-
+    // Read serial command.
+    
+    
     // Commands to write strings to the EEPROM, dump the EEPROM.
 
 }
