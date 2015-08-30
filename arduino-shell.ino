@@ -24,6 +24,7 @@
 #define ENABLE_UNIT_TESTS 1
 
 #include <EEPROM.h>
+#include <stdlib.h>
 
 #if ENABLE_UNIT_TESTS
 #include <assert.h>
@@ -84,8 +85,8 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 
         for (int column = 0; column < EEPROM_ROW_LENGTH; ++column)
         {
-            uint8_t msb =  eepromRow.data[column] & 0x0F;
-            uint8_t lsb = (eepromRow.data[column] & 0xF0) >> 4;
+            uint8_t msb = (eepromRow.data[column] & 0xF0) >> 4;
+            uint8_t lsb =  eepromRow.data[column] & 0x0F;
 
             uint8_t linePos = HEX_START + (column * 3);
 
@@ -215,7 +216,8 @@ static void test_command_and_params_class()
  * pleases.
  * 
  * You could use this to implement a chained command-processing scheme
- * with other modules, by registering this command in a central module.
+ * with other modules, by registering this command handler in a list
+ * of handlers.
  * 
  * (Someday, maybe, the Arduino environment will support projects.)
  * 
@@ -230,20 +232,21 @@ void ec_handle_command(String rawCommand)
     CommandAndParams cp(rawCommand);
     cp.print();
 
-//    //
-//    String command;
-//
-//    // Maximum number of params.
-//    const uint8_t MAX_PARAMS = 8;
-//    String params[MAX_PARAMS];
+    
+    if (cp.command.equals("wb") && cp.paramCount == 2)
+    {
+        // Convert to long.
+        long int address = strtol(cp.params[0].c_str(), NULL, 0);
+        Serial.println(address);
 
-//    int space = rawCommand.indexOf(' ');
-//    Serial.println(space);
+        if (!(0 <= address < EEPROM.length())) return;
 
-    // String command = rawCommand.substring(0, )
+        // Write the byte to the address.
+        long int data = strtol(cp.params[1].c_str(), NULL, 0) & 0xFF;
+        Serial.println(data);
 
-//    if (command.indexOf("wb") == 0 && command.length() == 12)
-//    {   
+        EEPROM.write(address, data);
+        
 //        // wb 0x0010 0x41 
 //        // Writes the specified byte to the specified location.
 //        // Must use full hex 
@@ -251,7 +254,7 @@ void ec_handle_command(String rawCommand)
 //        uint8_t value = (uint8_t) param.toInt();
 //
 //        // EEPROM.write(
-//    }
+    }
 //    else
 //    if (command.indexOf("writew") == 0 || command.indexOf("ww") == 0)
 //    {
