@@ -65,6 +65,9 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
         Serial.println(output);
         return;
     }
+
+    // Round to nearest row.
+    startAddress &= 0xFFF0;
     
     uint16_t  rows = length / EEPROM_ROW_LENGTH;
     uint8_t   mod  = length % EEPROM_ROW_LENGTH; // How many bytes in the last row?
@@ -249,15 +252,37 @@ void ec_handle_command(String rawCommand)
     {
         if (cp.paramCount == 0)
         {
+            // Example: p
+            //
             // Print entire EEPROM.
             ec_print_eeprom_contents(0, EEPROM.length());
         }
         else
         if (cp.paramCount == 1)
         {
+            // Example: p 0x10
+            //
             // Print row containing address.
             long int address = strtol(cp.params[0].c_str(), NULL, 0);
             ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
+        }
+        else
+        if (cp.paramCount == 2)
+        {
+            // Example: p 0x00 10
+            //
+            // Print the specified number of rows, starting from the row containing address.
+            long int address = strtol(cp.params[0].c_str(), NULL, 0);
+            long int rows    = strtol(cp.params[1].c_str(), NULL, 0);
+
+            // Find number of rows between address and EEPROM.length();
+            if (0 <= address && address < EEPROM.length())
+            {
+                int rowsLeft = (EEPROM.length() - address) >> 4;
+                rows = ((rows < rowsLeft) ? rows : rowsLeft);
+
+                ec_print_eeprom_contents(address, rows * EEPROM_ROW_LENGTH);
+            }
         }
     }
     else
