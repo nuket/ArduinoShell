@@ -1,4 +1,5 @@
 /**
+    Arduino Shell
     Copyright (c) 2015 Max Vilimpoc
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,8 +21,13 @@
     THE SOFTWARE.
 */
 
+#define ENABLE_UNIT_TESTS 1
+
 #include <EEPROM.h>
-#include <string.h>
+
+#if ENABLE_UNIT_TESTS
+#include <assert.h>
+#endif
 
 #define EEPROM_ROW_LENGTH 16
 #define OUTPUT_ROW_LENGTH 80
@@ -142,12 +148,13 @@ CommandAndParams::CommandAndParams(String rawCommand) :
         command = rawCommand.substring(0, spaceA);
     }
 
-    for (int i = 0; i < MAX_PARAMS; i++)
+    for (unsigned int i = 0; i < MAX_PARAMS; i++)
     {
-        spaceB = rawCommand.indexOf(' ', spaceA + 1);
+        spaceA++;
+        spaceB = rawCommand.indexOf(' ', spaceA);
 
-        Serial.println(spaceA);
-        Serial.println(spaceB);
+//        Serial.println(spaceA);
+//        Serial.println(spaceB);
 
         if (spaceB == -1)
         {
@@ -167,17 +174,41 @@ CommandAndParams::CommandAndParams(String rawCommand) :
 
 void CommandAndParams::print()
 {
-    Serial.print ("command: ");
-    Serial.println(command);
+    Serial.print("command: >>");
+    Serial.print(command);
+    Serial.println("<<");
     
     for (int i = 0; i < paramCount; i++)
     {
-        Serial.print ("param[");
-        Serial.print (i);
-        Serial.print ("]: ");
-        Serial.println(params[i]);
+        Serial.print("param[");
+        Serial.print(i);
+        Serial.print("]: >>");
+        Serial.print(params[i]);
+        Serial.println("<<");
     }
 }
+
+#if ENABLE_UNIT_TESTS
+static void test_command_and_params_class()
+{
+    Serial.println("CommandAndParams unit test starting.");
+    
+    CommandAndParams testA("test 1 2 3");
+    testA.print();
+    assert(String("test").equals(testA.command));
+    assert(String("1").equals(testA.params[0]));
+    assert(String("2").equals(testA.params[1]));
+    assert(String("3").equals(testA.params[2]));
+
+    CommandAndParams testB("wb 0x10 0x41"); // write the byte 'a' to position 0x10.
+    testB.print();
+    assert(String("wb").equals(testB.command));
+    assert(String("0x10").equals(testB.params[0]));
+    assert(String("0x41").equals(testB.params[1]));
+    
+    Serial.println("CommandAndParams unit test ending OK.");
+}
+#endif
 
 /**
  * Handles an incoming string command, and does whatever it damn well
@@ -257,6 +288,10 @@ void setup()
     Serial.println("");
 
     ec_print_eeprom_contents(0, EEPROM.length());
+
+#if ENABLE_UNIT_TESTS
+    test_command_and_params_class();
+#endif
 }
 
 void loop() 
