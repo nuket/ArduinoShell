@@ -57,6 +57,9 @@ static bool is_ascii(char c)
  */
 static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 {
+    // Quick check that range is valid.
+    if (startAddress >= EEPROM.length()) return;
+    
     uint16_t  rows = length / EEPROM_ROW_LENGTH;
     uint8_t   mod  = length % EEPROM_ROW_LENGTH; // How many bytes in the last row?
 
@@ -69,7 +72,7 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 
     for (int row = 0; row < rows; ++row)
     {
-        int address = row * EEPROM_ROW_LENGTH;
+        int address = startAddress + row * EEPROM_ROW_LENGTH;
         EEPROM.get(address, eepromRow);
 
         memset(outputRow, 0x20, (OUTPUT_ROW_LENGTH - 1));
@@ -109,10 +112,9 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 
 struct CommandAndParams
 {
-    bool usable;
-    
     String command;
-
+    bool   commandUsable;
+    
     enum { MAX_PARAMS = 8 };
     String params[MAX_PARAMS];
 
@@ -124,7 +126,7 @@ struct CommandAndParams
 };
 
 CommandAndParams::CommandAndParams(String rawCommand) :
-    usable(false),
+    commandUsable(false),
     paramCount(0)
 {
     // Trim whitespace in place.
@@ -134,7 +136,7 @@ CommandAndParams::CommandAndParams(String rawCommand) :
     if (rawCommand.length() == 0) return;
 
     // At least a command is available, maybe parameters are not.
-    usable = true;
+    commandUsable = true;
 
     int spaceA = rawCommand.indexOf(' ');
     int spaceB = -1;
@@ -175,7 +177,7 @@ CommandAndParams::CommandAndParams(String rawCommand) :
 
 void CommandAndParams::print()
 {
-    Serial.print("command: >>");
+    Serial.print("command:  >>");
     Serial.print(command);
     Serial.println("<<");
     
@@ -197,15 +199,19 @@ static void test_command_and_params_class()
     CommandAndParams testA("test 1 2 3");
     testA.print();
     assert(String("test").equals(testA.command));
+    assert(testA.commandUsable);
     assert(String("1").equals(testA.params[0]));
     assert(String("2").equals(testA.params[1]));
     assert(String("3").equals(testA.params[2]));
+    assert(testA.paramCount == 3);
 
     CommandAndParams testB("wb 0x10 0x41"); // write the byte 'a' to position 0x10.
     testB.print();
     assert(String("wb").equals(testB.command));
+    assert(testB.commandUsable);
     assert(String("0x10").equals(testB.params[0]));
     assert(String("0x41").equals(testB.params[1]));
+    assert(testB.paramCount == 2);
     
     Serial.println("CommandAndParams unit test ending OK.");
 }
@@ -232,28 +238,23 @@ void ec_handle_command(String rawCommand)
     CommandAndParams cp(rawCommand);
     cp.print();
 
-    
     if (cp.command.equals("wb") && cp.paramCount == 2)
     {
+        // Example: wb 0x0010 0x41 
+        // Writes the specified byte to the specified location.
+
         // Convert to long.
         long int address = strtol(cp.params[0].c_str(), NULL, 0);
-        Serial.println(address);
+        // Serial.println(address);
 
         if (!(0 <= address < EEPROM.length())) return;
 
         // Write the byte to the address.
         long int data = strtol(cp.params[1].c_str(), NULL, 0) & 0xFF;
-        Serial.println(data);
+        // Serial.println(data);
 
         EEPROM.write(address, data);
-        
-//        // wb 0x0010 0x41 
-//        // Writes the specified byte to the specified location.
-//        // Must use full hex 
-//        String  param = command.substring();
-//        uint8_t value = (uint8_t) param.toInt();
-//
-//        // EEPROM.write(
+        ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
     }
 //    else
 //    if (command.indexOf("writew") == 0 || command.indexOf("ww") == 0)
@@ -282,8 +283,8 @@ void setup()
 {
     Serial.begin(115200);
 
-    Serial.println("EEPROM Shell");
-    Serial.println("(c) 2015 Max Vilimpoc (https://github.com/nuket/arduino), MIT licensed.");
+    Serial.println("Arduino Shell");
+    Serial.println("(c) 2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
     Serial.println("");
 
     Serial.print("Size of EEPROM: ");
