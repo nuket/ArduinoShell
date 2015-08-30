@@ -1,4 +1,4 @@
-# arduino-shell
+# Arduino Shell
 A command shell to interact with built-in Arduino features via the Serial Monitor.
 
 Right now: Offers commands to print EEPROM contents in a hexdump-like form, and to write 
@@ -6,11 +6,13 @@ bytes into EEPROM. Other commands will be added, as needed.
 
 ## Startup
 
+At startup, the Arduino Shell will print the full contents of EEPROM.
+
 ## Command Examples
 
 ### `wb address byte`
 
-Write the `byte` to the specified `address`.
+Write the `byte` to the specified EEPROM `address`.
 
 ```
 wb 0x51 0x45
@@ -22,7 +24,7 @@ param[1]: >>0x45<<
 
 ### `p address rows`
 
-Print `rows` rows, starting from `address`.
+Print `rows` rows, starting from EEPROM `address`.
 
 ```
 p 0x00 10
