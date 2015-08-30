@@ -8,9 +8,9 @@ bytes into EEPROM. Other commands will be added, as needed.
 
 ## Command Examples
 
-### wb <address> <byte>
+### `wb address byte`
 
-Write the <byte> to the specified <address>.
+Write the `byte` to the specified `address`.
 
 ```
 wb 0x51 0x45
@@ -20,9 +20,9 @@ param[1]: >>0x45<<
 0050 | FF 45 FF FF FF FF FF FF FF FF FF FF FF FF FF FF | .E..............      
 ```
 
-### p <address> <rows>
+### `p address rows`
 
-Print <rows> rows, starting from <address>.
+Print `rows` rows, starting from `address`.
 
 ```
 p 0x00 10
