@@ -4,6 +4,10 @@ A command shell to interact with built-in Arduino features via the Serial Monito
 Right now: Offers commands to print EEPROM contents in a hexdump-like form, and to write 
 bytes into EEPROM. Other commands will be added, as needed.
 
+Also useful, a super-simple command parser class that breaks a raw input string into 
+a command and parameters, which can then be used by other logic to determine the 
+next steps.
+
 ## Startup
 
 At startup, the Arduino Shell will print the full contents of EEPROM.
