@@ -31,7 +31,7 @@ struct EepromRow
     uint8_t data[EEPROM_ROW_LENGTH];
 };
 
-bool is_ascii(char c)
+static bool is_ascii(char c)
 {
     // if ('a' <= c && c <= 'z') return true;
     // if ('A' <= c && c <= 'Z') return true;
@@ -48,7 +48,7 @@ bool is_ascii(char c)
  * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
  * to the next-lower block size.
  */
-void printEepromContents(uint32_t startAddress, uint32_t length)
+static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 {
     uint16_t  rows = length / EEPROM_ROW_LENGTH;
     uint8_t   mod  = length % EEPROM_ROW_LENGTH; // How many bytes in the last row?
@@ -100,26 +100,173 @@ void printEepromContents(uint32_t startAddress, uint32_t length)
     }
 }
 
+struct CommandAndParams
+{
+    bool usable;
+    
+    String command;
+
+    enum { MAX_PARAMS = 8 };
+    String params[MAX_PARAMS];
+
+    // Number of parameters parsed.
+    uint8_t paramCount;
+
+    CommandAndParams(String rawCommand);
+    void print();
+};
+
+CommandAndParams::CommandAndParams(String rawCommand) :
+    usable(false),
+    paramCount(0)
+{
+    // Trim whitespace in place.
+    rawCommand.trim();
+
+    // Check that the command was more than just whitespace.
+    if (rawCommand.length() == 0) return;
+
+    // At least a command is available, maybe parameters are not.
+    usable = true;
+
+    int spaceA = rawCommand.indexOf(' ');
+    int spaceB = -1;
+
+    // .indexOf returns -1 if character is not found.
+    if (spaceA == -1)
+    {
+        command = rawCommand;
+    }
+    else
+    {
+        command = rawCommand.substring(0, spaceA);
+    }
+
+    for (int i = 0; i < MAX_PARAMS; i++)
+    {
+        spaceB = rawCommand.indexOf(' ', spaceA + 1);
+
+        Serial.println(spaceA);
+        Serial.println(spaceB);
+
+        if (spaceB == -1)
+        {
+            params[i] = rawCommand.substring(spaceA);
+
+            // EOL reached.
+            paramCount = i + 1;
+            break;
+        }
+        else
+        {
+            params[i] = rawCommand.substring(spaceA, spaceB);
+            spaceA = spaceB;
+        }
+    }
+}
+
+void CommandAndParams::print()
+{
+    Serial.print ("command: ");
+    Serial.println(command);
+    
+    for (int i = 0; i < paramCount; i++)
+    {
+        Serial.print ("param[");
+        Serial.print (i);
+        Serial.print ("]: ");
+        Serial.println(params[i]);
+    }
+}
+
+/**
+ * Handles an incoming string command, and does whatever it damn well
+ * pleases.
+ * 
+ * You could use this to implement a chained command-processing scheme
+ * with other modules, by registering this command in a central module.
+ * 
+ * (Someday, maybe, the Arduino environment will support projects.)
+ * 
+ * rawCommand passed by value, so we can work on a copy of it.
+ */
+void ec_handle_command(String rawCommand)
+{
+    // Echo the command.
+    Serial.println(rawCommand);
+
+    // Parse it.
+    CommandAndParams cp(rawCommand);
+    cp.print();
+
+//    //
+//    String command;
+//
+//    // Maximum number of params.
+//    const uint8_t MAX_PARAMS = 8;
+//    String params[MAX_PARAMS];
+
+//    int space = rawCommand.indexOf(' ');
+//    Serial.println(space);
+
+    // String command = rawCommand.substring(0, )
+
+//    if (command.indexOf("wb") == 0 && command.length() == 12)
+//    {   
+//        // wb 0x0010 0x41 
+//        // Writes the specified byte to the specified location.
+//        // Must use full hex 
+//        String  param = command.substring();
+//        uint8_t value = (uint8_t) param.toInt();
+//
+//        // EEPROM.write(
+//    }
+//    else
+//    if (command.indexOf("writew") == 0 || command.indexOf("ww") == 0)
+//    {
+//        // Writes the specified 2-bytes to the specified location.
+//    }
+//    else
+//    if (command.indexOf("writed") == 0 || command.indexOf("wd") == 0)
+//    {
+//        // Writes the specified 4-bytes to the specified location.
+//    }
+//    else
+//    if (command.indexOf("read") == 0)
+//    {
+//        // Reads an amount of EEPROM and prints it in a form usable for the 'write' command.
+//        
+//    }
+//    else
+//    if (command.indexOf("erase") == 0)
+//    {
+//        // Erases the specified amount of EEPROM, starting from the specified address.
+//    }
+}
+
 void setup() 
 {
     Serial.begin(115200);
 
     Serial.println("EEPROM Shell");
-    Serial.println("(c) 2015 Max Vilimpoc (https://github.com/nuket/eeprom-shell), MIT licensed.");
+    Serial.println("(c) 2015 Max Vilimpoc (https://github.com/nuket/arduino), MIT licensed.");
     Serial.println("");
 
     Serial.print("Size of EEPROM: ");
     Serial.println(EEPROM.length());
     Serial.println("");
 
-    printEepromContents(0, EEPROM.length());
+    ec_print_eeprom_contents(0, EEPROM.length());
 }
 
 void loop() 
 {
-    // Read serial command.
+    const char TERMINATOR = '\n';
     
-    
-    // Commands to write strings to the EEPROM, dump the EEPROM.
-
+    // Read and process commands.
+    if (millis() % 1000 == 0 && Serial.available())
+    {
+        String command = Serial.readStringUntil(TERMINATOR);
+        ec_handle_command(command);
+    }
 }
