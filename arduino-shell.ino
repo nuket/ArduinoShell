@@ -21,7 +21,7 @@
     THE SOFTWARE.
 */
 
-#define ENABLE_UNIT_TESTS 1
+#define ENABLE_UNIT_TESTS 0
 
 #include <EEPROM.h>
 #include <stdlib.h>
@@ -58,7 +58,13 @@ static bool is_ascii(char c)
 static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
 {
     // Quick check that range is valid.
-    if (startAddress >= EEPROM.length()) return;
+    if (startAddress >= EEPROM.length())
+    {
+        char output[80] = {'\0'};
+        snprintf(output, 80, "Address (0x%04x) is out of EEPROM bounds [0, %04x].", startAddress, EEPROM.length());
+        Serial.println(output);
+        return;
+    }
     
     uint16_t  rows = length / EEPROM_ROW_LENGTH;
     uint8_t   mod  = length % EEPROM_ROW_LENGTH; // How many bytes in the last row?
@@ -145,6 +151,7 @@ CommandAndParams::CommandAndParams(String rawCommand) :
     if (spaceA == -1)
     {
         command = rawCommand;
+        return; // Return early, no parameters to be parsed.
     }
     else
     {
@@ -238,6 +245,22 @@ void ec_handle_command(String rawCommand)
     CommandAndParams cp(rawCommand);
     cp.print();
 
+    if (cp.command.equals("p"))
+    {
+        if (cp.paramCount == 0)
+        {
+            // Print entire EEPROM.
+            ec_print_eeprom_contents(0, EEPROM.length());
+        }
+        else
+        if (cp.paramCount == 1)
+        {
+            // Print row containing address.
+            long int address = strtol(cp.params[0].c_str(), NULL, 0);
+            ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
+        }
+    }
+    else
     if (cp.command.equals("wb") && cp.paramCount == 2)
     {
         // Example: wb 0x0010 0x41 
@@ -256,27 +279,6 @@ void ec_handle_command(String rawCommand)
         EEPROM.write(address, data);
         ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
     }
-//    else
-//    if (command.indexOf("writew") == 0 || command.indexOf("ww") == 0)
-//    {
-//        // Writes the specified 2-bytes to the specified location.
-//    }
-//    else
-//    if (command.indexOf("writed") == 0 || command.indexOf("wd") == 0)
-//    {
-//        // Writes the specified 4-bytes to the specified location.
-//    }
-//    else
-//    if (command.indexOf("read") == 0)
-//    {
-//        // Reads an amount of EEPROM and prints it in a form usable for the 'write' command.
-//        
-//    }
-//    else
-//    if (command.indexOf("erase") == 0)
-//    {
-//        // Erases the specified amount of EEPROM, starting from the specified address.
-//    }
 }
 
 void setup() 
