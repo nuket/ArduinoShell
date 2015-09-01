@@ -60,8 +60,8 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
     // Quick check that range is valid.
     if (startAddress >= EEPROM.length())
     {
-        char output[80] = {'\0'};
-        snprintf(output, 80, "Address (0x%04x) is out of EEPROM bounds [0, %04x].", startAddress, EEPROM.length());
+        char output[OUTPUT_ROW_LENGTH] = {'\0'};
+        snprintf(output, OUTPUT_ROW_LENGTH, "Address (0x%04x) is out of EEPROM bounds [0, %04x].", startAddress, EEPROM.length());
         Serial.println(output);
         return;
     }
@@ -306,6 +306,263 @@ void ec_handle_command(String rawCommand)
     }
 }
 
+// -----------------------------------------------------------------------
+// ShellModule
+//
+// Defines a set of functionality, and corresponding EEPROM configuration
+// management.
+// -----------------------------------------------------------------------
+
+class ShellModule
+{
+public:
+    //! Module initialization code goes here.
+    // virtual void boot();
+
+    //! Help string explaining commands goes here.
+    virtual void help();
+
+    //! Command processing and execution goes here.
+    virtual void run(String rawCommand);
+
+    //! Default settings can be persisted here in an arbitrary format.
+    virtual void saveDefaults();
+
+    //! Default settings are loaded here.
+    // virtual void loadDefaults();
+};
+
+// -----------------------------------------------------------------------
+// DigitalPinShell module
+//
+// Manipulate the digital pins, and save the config to EEPROM.
+// -----------------------------------------------------------------------
+
+class DigitalPinShell : public ShellModule
+{
+public:
+    static const uint8_t MAX_PINS = 64;
+
+    //! Specifies where in EEPROM the defaults are stored.
+    const uint32_t configBase;
+    
+    // void boot();
+    
+    void help() override;
+    void run(String rawCommand) override;
+
+    void saveDefaults() override;
+    // void loadDefaults() override;
+
+private:
+    struct
+    {
+        uint64_t io;     // INPUT = 0, OUTPUT = 1
+        uint64_t pullup; // INPUT_PULLUP means set this = 1, when necessary.
+        uint64_t value;  // HIGH or LOW.
+    } config;
+
+    void configPinMode (const uint8_t pin, const int mode);
+    void configPinValue(const uint8_t pin, const int value);
+public:
+    DigitalPinShell(const uint32_t configBase);
+};
+
+DigitalPinShell::DigitalPinShell(const uint32_t configBase) :
+    configBase(configBase)
+{
+}
+
+void DigitalPinShell::help()
+{
+}
+
+void DigitalPinShell::run(String rawCommand)
+{
+    // Echo the command.
+    Serial.println(rawCommand);
+
+    // Parse it.
+    CommandAndParams cp(rawCommand);
+    cp.print();
+
+    if (!cp.command.equals("pin")) return;
+
+    // Examples: pin 8 in
+    //           pin 8 out
+    //           pin 8 in_pullup
+    //           pin 8 high
+    //           pin 8 low
+    //           pin save
+    if (cp.paramCount == 1)
+    {
+        if (String("save").equals(cp.params[0]))
+        {
+            saveDefaults();
+        }
+    }
+    else
+    if (cp.paramCount == 2)
+    {
+        // Set up I/O pins, turn them on or off (if set to output)
+        if (String("all").equals(cp.params[0]))
+        {
+            if (String("out").equals(cp.params[1]))
+            {
+                for (int i = 0; i < MAX_PINS; i++)
+                {
+                    
+                }
+            }
+        }
+        else
+        {
+            long int pin = strtol(cp.params[0].c_str(), NULL, 0);
+            Serial.println(pin);
+
+            if (String("in").equals(cp.params[1].c_str()))
+            {
+                configPinMode(pin, INPUT);
+            }
+            else
+            if (String("out").equals(cp.params[1].c_str()))
+            {
+                configPinMode(pin, OUTPUT);
+            }
+            else
+            if (String("in_pullup").equals(cp.params[1].c_str()))
+            {
+                configPinMode(pin, INPUT_PULLUP);
+            }
+            else
+            if (String("high").equals(cp.params[1].c_str()))
+            {
+                configPinValue(pin, HIGH);
+            }
+            else
+            if (String("low").equals(cp.params[1].c_str()))
+            {
+                configPinValue(pin, LOW);
+            }
+        }
+    }
+
+    // Save the pin configuration to EEPROM?
+    // save();
+}
+
+void DigitalPinShell::saveDefaults()
+{
+}
+
+//void DigitalPinShell::loadDefaults()
+//{   
+//}
+
+void DigitalPinShell::configPinMode(const uint8_t pin, const int mode)
+{
+    uint64_t configBit = 1;
+
+    // Quick exit.
+    if (pin >= 64) return;
+
+    // Figure out which bits need twiddling.
+    configBit <<= pin;
+    
+    switch(mode)
+    {
+        case INPUT:
+            config.io     &= ~configBit;
+            config.pullup &= ~configBit;
+            break;
+        case OUTPUT:
+            config.io     |=  configBit;
+            config.pullup &= ~configBit;
+            break;
+        case INPUT_PULLUP:
+            config.io     &= ~configBit;
+            config.pullup |=  configBit;
+            break;
+    }
+
+    pinMode(pin, mode);
+}
+
+void DigitalPinShell::configPinValue(const uint8_t pin, const int mode)
+{
+    uint64_t configBit = 1;
+
+    // Quick exit.
+    if (pin >= 64) return;
+    if (!(HIGH == mode || LOW == mode)) return;
+
+    // Figure out which bits represent current pin config.
+    configBit <<= pin;
+    
+    // Pin has to be in OUTPUT mode to set HIGH / LOW.
+    if (config.io & configBit)
+    {
+        if (mode == HIGH)
+        {
+            config.value |= configBit;
+        }
+        else
+        {
+            config.value &= ~configBit;
+        }
+
+        digitalWrite(pin, mode);
+    }
+}
+
+// -----------------------------------------------------------------------
+// AnalogPin module
+// -----------------------------------------------------------------------
+
+/**
+ * Handles an incoming string command, and does whatever it damn well
+ * pleases.
+ */ 
+void pin_handle_command(String rawCommand)
+{
+    // Echo the command.
+    Serial.println(rawCommand);
+
+    // Parse it.
+    CommandAndParams cp(rawCommand);
+    cp.print();
+
+    if (cp.command.equals("pin"))
+    {
+        // Examples: pin 8 out
+        //           pin 8 in
+        //           pin 8 off
+        //           pin 8 on
+        //
+        // Set up I/O pins, turn them on or off (if set to output)
+
+        // Save the pin configuration to EEPROM?
+    }
+}
+
+void pin_config_save()
+{
+}
+
+void pin_config_load()
+{
+}
+
+// -----------------------------------------------------------------------
+// Globals
+// -----------------------------------------------------------------------
+
+DigitalPinShell digitalPinShell(0x0100);
+
+// -----------------------------------------------------------------------
+// main()
+// -----------------------------------------------------------------------
+
 void setup() 
 {
     Serial.begin(115200);
@@ -334,5 +591,7 @@ void loop()
     {
         String command = Serial.readStringUntil(TERMINATOR);
         ec_handle_command(command);
+
+        digitalPinShell.run(command);
     }
 }
