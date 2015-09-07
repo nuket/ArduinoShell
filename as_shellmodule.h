@@ -1,4 +1,4 @@
-/**
+/*
     Arduino Shell
     Copyright (c) 2015 Max Vilimpoc
     
@@ -21,29 +21,45 @@
     THE SOFTWARE.
 */
 
-// -----------------------------------------------------------------------
-// ShellModule
-//
-// Defines a set of functionality, and corresponding EEPROM configuration
-// management.
-// -----------------------------------------------------------------------
+/**
+ * \file
+ */
 
 #include <Arduino.h>
 
+/**
+ * Declares the interface that all shell modules implement.
+ */
 class ShellModule
 {
 public:
-    //! Module initialization code goes here.
+    /**
+     * \brief Module initialization code goes here.
+     * 
+     * Setup actions specific to the module should be handled by
+     * the derived class, though this has an empty default
+     * implementation in case nothing specific needs to happen.
+     */
     virtual void setup();
 
-    //! Help string explaining commands goes here.
-    virtual void help();
+    /**
+     * \brief Module help string goes here.
+     * 
+     * This method can either choose to print the help string itself, 
+     * or pass back a readonly reference that can be used by the caller,
+     * or both.
+     */
+    virtual const String& help() = 0;
 
-    //! Command processing and execution goes here.
-    virtual void run(String rawCommand);
+    /**
+     * \brief Command processing and execution goes here.
+     */
+    virtual void run(String rawCommand) = 0;
 
-    //! Default settings can be persisted here in an arbitrary format.
-    virtual void saveDefaults();
+    /**
+     * \brief Default settings can be persisted here in an arbitrary format.
+     */
+    // virtual void saveDefaults();
 
     //! Default settings are loaded here.
     // virtual void loadDefaults();

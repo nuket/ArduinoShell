@@ -1,5 +1,4 @@
 /**
- * \file crc.c
  * Functions and types for CRC checks.
  *
  * Generated on Tue Sep  1 23:48:53 2015,

@@ -1,4 +1,4 @@
-/**
+/*
     Arduino Shell
     Copyright (c) 2015 Max Vilimpoc
     
@@ -21,20 +21,36 @@
     THE SOFTWARE.
 */
 
+/**
+ * \file
+ */
+
 #include <Arduino.h>
 
+/**
+ * \class CommandAndParams
+ * \brief Simple container to parse a command and parameters out of a String.
+ */
 struct CommandAndParams
 {
-    String command;
-    bool   commandUsable;
+    String command;                        //!< The command to be performed.
+    bool   commandUsable;                  //!< Was a command available in the input string?
     
     enum { MAX_PARAMS = 8 };
-    String params[MAX_PARAMS];
 
-    // Number of parameters parsed.
-    uint8_t paramCount;
+    String  params[MAX_PARAMS];            //!< Up to MAX_PARAM parsed parameters are stored here.
+    uint8_t paramCount;                    //!< Number of parameters actually parsed.
 
+    /**
+     * Ctor.
+     * 
+     * \param rawCommand  A raw string to parse for a command and parameters.
+     */
     CommandAndParams(String rawCommand);
+
+    /**
+     * Prints the parsed command and params.
+     */
     void print();
 };
 

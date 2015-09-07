@@ -1,6 +1,6 @@
 /**
- * \file crc.h
- * Functions and types for CRC checks.
+ * \file
+ * \brief Functions and types for CRC checks.
  *
  * Generated on Tue Sep  1 23:48:57 2015,
  * by pycrc v0.8.3, https://pycrc.org

@@ -1,4 +1,4 @@
-/**
+/*
     Arduino Shell
     Copyright (c) 2015 Max Vilimpoc
     
