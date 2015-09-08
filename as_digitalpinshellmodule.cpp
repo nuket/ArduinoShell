@@ -22,17 +22,19 @@
 */
 
 #include "as_commandandparams.h"
+#include "as_configblock.h"
 #include "as_crc.h"
 #include "as_digitalpinshellmodule.h"
 
 #include <EEPROM.h>
 
-DigitalPinShell::DigitalPinShell(const uint32_t configBase) :
-    configBase(configBase)
+DigitalPinShellModule::DigitalPinShellModule(const uint32_t configBase, Stream& serialOut) :
+    configBase(configBase),
+    serialOut(serialOut)
 {
 }
 
-void DigitalPinShell::setup()
+void DigitalPinShellModule::setup()
 {
     // Check the config block, and if the .id and .crc are valid,
     // load the defaults and apply them.
@@ -48,7 +50,7 @@ void DigitalPinShell::setup()
     crc = crc_update(crc, (const uint8_t *) &config, sizeof(config));
     crc = crc_finalize(crc);
 
-    // Serial.println(crc, HEX);
+    // serialOut.println(crc, HEX);
 
     if (MODULE_ID == config.id && crc == storedCrc)
     {
@@ -58,14 +60,14 @@ void DigitalPinShell::setup()
     }
 }
 
-void DigitalPinShell::help()
+const String& DigitalPinShellModule::help()
 {
 }
 
-void DigitalPinShell::run(String rawCommand)
+void DigitalPinShellModule::run(String rawCommand)
 {
     // Echo the command.
-    Serial.println(rawCommand);
+    serialOut.println(rawCommand);
 
     // Parse it.
     CommandAndParams cp(rawCommand);
@@ -81,7 +83,7 @@ void DigitalPinShell::run(String rawCommand)
     //           pin save
     if (cp.paramCount == 1)
     {
-        if (String("save").equals(cp.params[0]))
+        if (cp.params[0].equals("save"))
         {
             saveDefaults();
         }
@@ -90,9 +92,9 @@ void DigitalPinShell::run(String rawCommand)
     if (cp.paramCount == 2)
     {
         // Set up I/O pins, turn them on or off (if set to output)
-        if (String("all").equals(cp.params[0]))
+        if (cp.params[0].equals("all"))
         {
-            if (String("out").equals(cp.params[1]))
+            if (cp.params[1].equals("out"))
             {
                 for (int i = 0; i < MAX_PINS; i++)
                 {
@@ -103,29 +105,29 @@ void DigitalPinShell::run(String rawCommand)
         else
         {
             long int pin = strtol(cp.params[0].c_str(), NULL, 0);
-            // Serial.println(pin);
+            // serialOut.println(pin);
 
-            if (String("in").equals(cp.params[1].c_str()))
+            if (cp.params[1].equals("in"))
             {
                 configPinMode(pin, INPUT);
             }
             else
-            if (String("out").equals(cp.params[1].c_str()))
+            if (cp.params[1].equals("out"))
             {
                 configPinMode(pin, OUTPUT);
             }
             else
-            if (String("in_pullup").equals(cp.params[1].c_str()))
+            if (cp.params[1].equals("in_pullup"))
             {
                 configPinMode(pin, INPUT_PULLUP);
             }
             else
-            if (String("high").equals(cp.params[1].c_str()))
+            if (cp.params[1].equals("high"))
             {
                 configPinValue(pin, HIGH);
             }
             else
-            if (String("low").equals(cp.params[1].c_str()))
+            if  (cp.params[1].equals("low"))
             {
                 configPinValue(pin, LOW);
             }
@@ -136,16 +138,16 @@ void DigitalPinShell::run(String rawCommand)
     // save();
 }
 
-void DigitalPinShell::saveDefaults()
+void DigitalPinShellModule::saveDefaults()
 {
     EEPROM.put(configBase, config);
 }
 
-//void DigitalPinShell::loadDefaults()
+//void DigitalPinShellModule::loadDefaults()
 //{   
 //}
 
-void DigitalPinShell::configPinMode(const uint8_t pin, const int mode)
+void DigitalPinShellModule::configPinMode(const uint8_t pin, const int mode)
 {
     uint64_t configBit = 1;
 
@@ -171,13 +173,13 @@ void DigitalPinShell::configPinMode(const uint8_t pin, const int mode)
             break;
     }
 
-    Serial.print((uint32_t)  (config.io & 0xFFFFFFFF), HEX);
-    Serial.print((uint32_t) ((config.io & 0xFFFFFFFF00000000) >> 32), HEX);
+    serialOut.print((uint32_t)  (config.io & 0xFFFFFFFF), HEX);
+    serialOut.print((uint32_t) ((config.io & 0xFFFFFFFF00000000) >> 32), HEX);
 
     pinMode(pin, mode);
 }
 
-void DigitalPinShell::configPinValue(const uint8_t pin, const int mode)
+void DigitalPinShellModule::configPinValue(const uint8_t pin, const int mode)
 {
     uint64_t configBit = 1;
 

@@ -218,7 +218,7 @@ void ec_handle_command(String rawCommand)
 // Globals
 // -----------------------------------------------------------------------
 
-DigitalPinShell digitalPinShell(0x0100);
+DigitalPinShellModule digitalPinShell(0x0100);
 
 // -----------------------------------------------------------------------
 // main()

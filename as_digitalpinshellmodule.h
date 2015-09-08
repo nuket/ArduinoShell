@@ -48,7 +48,7 @@ public:
     const String& help() override;
     void run(String rawCommand) override;
 
-    void saveDefaults() override;
+    void saveDefaults();
     // void loadDefaults() override;
 
 private:
@@ -62,14 +62,17 @@ private:
         uint64_t value;  //!< HIGH or LOW.
     } config;
 
+    //! The serial output stream to send status and debugging messages.
+    Stream& serialOut;
+
     //! Wrapper for pinMode, to set bits in config block.
     void configPinMode (const uint8_t pin, const int mode);
 
     //! Wrapper for digitalWrite, to set bits in config block.
     void configPinValue(const uint8_t pin, const int value);
 public:
-    //! Configure this module and set the EEPROM config block base address.
-    DigitalPinShellModule(const uint32_t configBase);
+    //! Set the EEPROM config block base address and serial output port.
+    DigitalPinShellModule(const uint32_t configBase, Stream& serialOut = Serial);
 };
 
 #endif  /* __AS_DIGITALPINSHELLMODULE_H__ */
