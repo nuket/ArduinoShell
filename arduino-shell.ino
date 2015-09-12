@@ -53,8 +53,8 @@ void setup()
     Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
     Serial.println("");
 
-    eepromShell.setup();
     digitalPinShell.setup();
+    eepromShell.setup();
 
 #if ENABLE_UNIT_TESTS
     test_command_and_params_class();
@@ -70,7 +70,7 @@ void loop()
     {
         String command = Serial.readStringUntil(TERMINATOR);
         
-        // digitalPinShell.run(command);
+        digitalPinShell.run(command);
         eepromShell.run(command);
     }
 }
