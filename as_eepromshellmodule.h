@@ -25,47 +25,30 @@
  * \file
  */
 
-#ifndef __AS_SHELLMODULE_H__
-#define __AS_SHELLMODULE_H__
+#ifndef __AS_EEPROMSHELLMODULE_H__
+#define __AS_EEPROMSHELLMODULE_H__
 
-#include <Arduino.h>
+#include "as_shellmodule.h"
 
-/**
- * Declares the interface that all shell modules implement.
- */
-class ShellModule
+class EepromShellModule : public ShellModule
 {
+    Stream& serialOut;
+    
+    /**
+     * Prints the contents of EEPROM from startAddress to startAddress + length.
+     * 
+     * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
+     * 
+     * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
+     * to the next-lower block size.
+     */
+    void printContents(uint32_t startAddress, uint32_t length);
 public:
-    /**
-     * \brief Module initialization code goes here.
-     * 
-     * Setup actions specific to the module should be handled by
-     * the derived class, though this has an empty default
-     * implementation in case nothing specific needs to happen.
-     */
-    virtual void setup();
+    void setup() override;
+    const String& help() override;
+    void run(String rawCommand) override;
 
-    /**
-     * \brief Module help string goes here.
-     * 
-     * This method can either choose to print the help string itself, 
-     * or pass back a readonly reference that can be used by the caller,
-     * or both.
-     */
-    virtual const String& help() = 0;
-
-    /**
-     * \brief Command processing and execution goes here.
-     */
-    virtual void run(String rawCommand) = 0;
-
-    /**
-     * \brief Default settings can be persisted here in an arbitrary format.
-     */
-    // virtual void saveDefaults();
-
-    //! Default settings are loaded here.
-    // virtual void loadDefaults();
+    EepromShellModule(Stream& serialOut);
 };
 
-#endif // __AS_SHELLMODULE_H__
+#endif // __AS_EEPROMSHELLMODULE_H__
