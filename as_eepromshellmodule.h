@@ -33,6 +33,15 @@
 class EepromShellModule : public ShellModule
 {
     Stream& serialOut;
+    
+    /**
+     * Prints the contents of EEPROM from startAddress to startAddress + length.
+     * 
+     * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
+     * 
+     * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
+     * to the next-lower block size.
+     */
     void printContents(uint32_t startAddress, uint32_t length);
 public:
     void setup() override;
