@@ -30,6 +30,8 @@
 
 #include "as_shellmodule.h"
 
+class ConfigBlock;
+
 /**
  * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
  */
@@ -39,8 +41,11 @@ public:
     static const uint32_t MODULE_ID = 0x4450534d; //!< 'DPSM' - used to identify the module config block in EEPROM.
     static const uint8_t  MAX_PINS  = 64;
 
+    //! Shared Config Block.
+    ConfigBlock& configBlock;
+
     //! Specifies where defaults are stored in EEPROM.
-    const uint32_t configBase;
+    // const uint32_t configBase;
 
     //! Sets up the digital I/O pins, using stored EEPROM defaults.
     void setup() override;
@@ -72,7 +77,7 @@ private:
     void configPinValue(const uint8_t pin, const int value);
 public:
     //! Set the EEPROM config block base address and serial output port.
-    DigitalPinShellModule(const uint32_t configBase, Stream& serialOut = Serial);
+    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
 
 #endif  /* __AS_DIGITALPINSHELLMODULE_H__ */

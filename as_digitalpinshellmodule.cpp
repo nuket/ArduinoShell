@@ -28,8 +28,8 @@
 
 #include <EEPROM.h>
 
-DigitalPinShellModule::DigitalPinShellModule(const uint32_t configBase, Stream& serialOut) :
-    configBase(configBase),
+DigitalPinShellModule::DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut) :
+    configBlock(configBlock),
     serialOut(serialOut)
 {
 }

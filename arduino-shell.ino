@@ -24,6 +24,7 @@
 // #define ENABLE_UNIT_TESTS 0
 
 #include "as_commandandparams.h"
+#include "as_configblock.h"
 #include "as_crc.h"
 #include "as_digitalpinshellmodule.h"
 #include "as_eepromshellmodule.h"
@@ -38,8 +39,11 @@
 // Globals
 // -----------------------------------------------------------------------
 
-DigitalPinShellModule digitalPinShell(0x0100);
-EepromShellModule     eepromShell(Serial);
+Stream&               serialOut(Serial);
+
+ConfigBlock           configBlock(0x0000);
+DigitalPinShellModule digitalPinShell(configBlock, serialOut);
+EepromShellModule     eepromShell(serialOut);
 
 // -----------------------------------------------------------------------
 // main()

@@ -30,7 +30,7 @@
 
 class ConfigBlock
 {
-    enum PinType
+    enum class PinType
     {
         NO_TYPE              = 0,  //!< Don't bother configuring at setup time.
         DIGITAL_INPUT        = 1,
@@ -47,8 +47,8 @@ class ConfigBlock
 
     struct PinConfig
     {
-        int type  : 4;  //!< Not type-safe.
-        int value;      //!< Starting value, 0 / 1 for DIGITAL_OUTPUT, 0 - 255 for PWM?
+        PinType type : 4;  //!< Not type-safe.
+        int     value;     //!< Starting value, 0 / 1 for DIGITAL_OUTPUT, 0 - 255 for PWM?
     };
 
     struct Data
