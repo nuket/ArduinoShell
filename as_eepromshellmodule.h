@@ -32,7 +32,8 @@
 
 class EepromShellModule : public ShellModule
 {
-    Stream& serialOut;    
+    Stream& serialOut;
+    void printContents(uint32_t startAddress, uint32_t length);
 public:
     void setup() override;
     const String& help() override;

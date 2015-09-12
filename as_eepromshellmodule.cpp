@@ -72,14 +72,14 @@ static bool is_ascii(char c)
  * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
  * to the next-lower block size.
  */
-static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
+void EepromShellModule::printContents(uint32_t startAddress, uint32_t length)
 {
     // Quick check that range is valid.
     if (startAddress >= EEPROM.length())
     {
         char output[OUTPUT_ROW_LENGTH] = {'\0'};
         snprintf(output, OUTPUT_ROW_LENGTH, "Address (0x%04x) is out of EEPROM bounds [0, %04x].", startAddress, EEPROM.length());
-        Serial.println(output);
+        serialOut.println(output);
         return;
     }
 
@@ -132,7 +132,7 @@ static void ec_print_eeprom_contents(uint32_t startAddress, uint32_t length)
             outputRow[ASCII_START + column] = is_ascii(eepromRow.data[column]) ? eepromRow.data[column] : '.'; 
         }
 
-        Serial.println(outputRow);
+        serialOut.println(outputRow);
     }
 }
 
@@ -143,7 +143,7 @@ void EepromShellModule::run(String rawCommand)
 
     // Parse it.
     CommandAndParams cp(rawCommand);
-    cp.print();
+    // cp.print();
 
     if (cp.command.equals("p"))
     {
@@ -152,7 +152,7 @@ void EepromShellModule::run(String rawCommand)
             // Example: p
             //
             // Print entire EEPROM.
-            ec_print_eeprom_contents(0, EEPROM.length());
+            printContents(0, EEPROM.length());
         }
         else
         if (cp.paramCount == 1)
@@ -161,7 +161,7 @@ void EepromShellModule::run(String rawCommand)
             //
             // Print row containing address.
             long int address = strtol(cp.params[0].c_str(), NULL, 0);
-            ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
+            printContents(address & 0xFFF0, EEPROM_ROW_LENGTH);
         }
         else
         if (cp.paramCount == 2)
@@ -178,7 +178,7 @@ void EepromShellModule::run(String rawCommand)
                 int rowsLeft = (EEPROM.length() - address) >> 4;
                 rows = ((rows < rowsLeft) ? rows : rowsLeft);
 
-                ec_print_eeprom_contents(address, rows * EEPROM_ROW_LENGTH);
+                printContents(address, rows * EEPROM_ROW_LENGTH);
             }
         }
     }
@@ -199,7 +199,7 @@ void EepromShellModule::run(String rawCommand)
         // Serial.println(data);
 
         EEPROM.put(address, data);
-        ec_print_eeprom_contents(address & 0xFFF0, EEPROM_ROW_LENGTH);
+        printContents(address & 0xFFF0, EEPROM_ROW_LENGTH);
     }
     else
     if (cp.command.equals("clear-eeprom") == 0)
