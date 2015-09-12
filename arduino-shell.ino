@@ -39,10 +39,8 @@
 // Globals
 // -----------------------------------------------------------------------
 
-// Stream&               serialOut(Serial.begin(115200));
-
-ConfigBlock * configBlock;
-// DigitalPinShellModule digitalPinShell(configBlock, serialOut);
+ConfigBlock             configBlock(0x0000, Serial);
+DigitalPinShellModule   digitalPinShell(configBlock, Serial);
 // EepromShellModule     eepromShell(serialOut);
 
 // -----------------------------------------------------------------------
@@ -57,9 +55,9 @@ void setup()
     Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
     Serial.println("");
 
-    configBlock = new ConfigBlock(0x0000, Serial);
-    configBlock->cat();
+    
 
+//    configBlock.cat();
 //    digitalPinShell.setup();
 //    eepromShell.setup();
 //
@@ -72,12 +70,12 @@ void loop()
 {
     const char TERMINATOR = '\n';
     
-//    // Read and process commands.
-//    if (millis() % 1000 == 0 && Serial.available())
-//    {
-//        String command = Serial.readStringUntil(TERMINATOR);
-//        
-//        digitalPinShell.run(command);
+    // Read and process commands.
+    if (millis() % 1000 == 0 && Serial.available())
+    {
+        String command = Serial.readStringUntil(TERMINATOR);
+
+        digitalPinShell.run(command);
 //        eepromShell.run(command);
-//    }
+    }
 }

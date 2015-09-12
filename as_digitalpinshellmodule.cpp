@@ -23,7 +23,6 @@
 
 #include "as_commandandparams.h"
 #include "as_configblock.h"
-#include "as_crc.h"
 #include "as_digitalpinshellmodule.h"
 
 #include <EEPROM.h>
@@ -34,8 +33,31 @@ DigitalPinShellModule::DigitalPinShellModule(ConfigBlock& configBlock, Stream& s
 {
 }
 
+/**
+ * Restore the saved configuration of each of pins.
+ */
 void DigitalPinShellModule::setup()
 {
+    for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
+    {
+        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_INPUT)) 
+        { 
+            pinMode(i, INPUT);
+        }
+        else
+        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_OUTPUT))       
+        { 
+            pinMode(i, OUTPUT);
+
+            // Apply the saved output value.
+            
+        }
+        else
+        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_INPUT_PULLUP)) 
+        { 
+            pinMode(i, INPUT_PULLUP);
+        }
+    }
 }
 
 const String& DigitalPinShellModule::help()
@@ -49,7 +71,7 @@ void DigitalPinShellModule::run(String rawCommand)
 
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
-    // cp.print();
+    cp.print();
 
     if (!cp.command.equals("pin")) return;
 
@@ -58,15 +80,6 @@ void DigitalPinShellModule::run(String rawCommand)
     //           pin 8 in_pullup
     //           pin 8 high
     //           pin 8 low
-    //           pin save
-    if (cp.paramCount == 1)
-    {
-        if (cp.params[0].equals("save"))
-        {
-            saveDefaults();
-        }
-    }
-    else
     if (cp.paramCount == 2)
     {
         // Set up I/O pins, turn them on or off (if set to output)
@@ -74,9 +87,8 @@ void DigitalPinShellModule::run(String rawCommand)
         {
             if (cp.params[1].equals("out"))
             {
-                for (int i = 0; i < MAX_PINS; i++)
+                for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
                 {
-                    
                 }
             }
         }
@@ -87,101 +99,49 @@ void DigitalPinShellModule::run(String rawCommand)
 
             if (cp.params[1].equals("in"))
             {
-                configPinMode(pin, INPUT);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_INPUT);
+                pinMode(pin, INPUT);
             }
             else
             if (cp.params[1].equals("out"))
             {
-                configPinMode(pin, OUTPUT);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
+                pinMode(pin, OUTPUT);
             }
             else
             if (cp.params[1].equals("in_pullup"))
             {
-                configPinMode(pin, INPUT_PULLUP);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_INPUT_PULLUP);
+                pinMode(pin, INPUT_PULLUP);
             }
             else
             if (cp.params[1].equals("high"))
             {
-                configPinValue(pin, HIGH);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
+                pinMode(pin, OUTPUT);
+                
+                configBlock.setPinValue(pin, HIGH);
+                digitalWrite(pin, HIGH);
             }
             else
             if  (cp.params[1].equals("low"))
             {
-                configPinValue(pin, LOW);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
+                pinMode(pin, OUTPUT);
+                
+                configBlock.setPinValue(pin, LOW);
+                digitalWrite(pin, LOW);
             }
         }
     }
-
-    // Save the pin configuration to EEPROM?
-    // save();
 }
 
 void DigitalPinShellModule::saveDefaults()
 {
-    // EEPROM.put(configBase, config);
     configBlock.save();
 }
 
 //void DigitalPinShellModule::loadDefaults()
 //{   
 //}
-
-void DigitalPinShellModule::configPinMode(const uint8_t pin, const int mode)
-{
-    uint64_t configBit = 1;
-
-    // Quick exit.
-    if (pin >= 64) return;
-
-    // Figure out which bits need twiddling.
-    configBit <<= pin;
-    
-    switch(mode)
-    {
-        case INPUT:
-            config.io     &= ~configBit;
-            config.pullup &= ~configBit;
-            break;
-        case OUTPUT:
-            config.io     |=  configBit;
-            config.pullup &= ~configBit;
-            break;
-        case INPUT_PULLUP:
-            config.io     &= ~configBit;
-            config.pullup |=  configBit;
-            break;
-    }
-
-    serialOut.print((uint32_t)  (config.io & 0xFFFFFFFF), HEX);
-    serialOut.print((uint32_t) ((config.io & 0xFFFFFFFF00000000) >> 32), HEX);
-
-    pinMode(pin, mode);
-}
-
-void DigitalPinShellModule::configPinValue(const uint8_t pin, const int mode)
-{
-    uint64_t configBit = 1;
-
-    // Quick exit.
-    if (pin >= 64) return;
-    if (!(HIGH == mode || LOW == mode)) return;
-
-    // Figure out which bits represent current pin config.
-    configBit <<= pin;
-    
-    // Pin has to be in OUTPUT mode to set HIGH / LOW.
-    if (config.io & configBit)
-    {
-        if (mode == HIGH)
-        {
-            config.value |= configBit;
-        }
-        else
-        {
-            config.value &= ~configBit;
-        }
-
-        digitalWrite(pin, mode);
-    }
-}
 

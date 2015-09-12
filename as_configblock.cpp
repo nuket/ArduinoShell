@@ -77,3 +77,28 @@ void ConfigBlock::cat()
     }
 }
 
+void ConfigBlock::setPinType(uint8_t pin, PinType pinType)
+{
+    if (pin     >= MAX_PINS)            return;
+    if (pinType >= PinType::LAST_ENTRY) return;
+
+    configBlock.data[pin].type = pinType;
+    cat();
+}
+
+void ConfigBlock::setPinValue(uint8_t pin, uint32_t value)
+{
+    if (pin     >= MAX_PINS)              return;
+    if (!(HIGH == value || LOW == value)) return;
+
+    configBlock.data[pin].value = value;
+}
+
+bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
+{
+    if (pin     >= MAX_PINS)            return false;
+    if (pinType >= PinType::LAST_ENTRY) return false;
+
+    return (configBlock.data[pin].type == pinType);
+}
+

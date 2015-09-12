@@ -70,10 +70,21 @@ public:
         "SERIAL_SPI"
     };
 
+    union PinValue
+    {
+        uint8_t  digital;     //!< HIGH / LOW for DIGITAL_OUTPUT
+        uint32_t pwm;       //!< 0 - 255 for PWM
+        struct
+        {
+            uint32_t baud;     //!< Baudrate 9600 - 115200
+            uint8_t  settings; //!< See: hardware/arduino/avr/cores/arduino/HardwareSerial.h for settings.
+        };
+    };
+
     struct PinConfig
     {
-        PinType type : 4;  //!< Not type-safe.
-        int     value;     //!< Starting value, 0 / 1 for DIGITAL_OUTPUT, 0 - 255 for PWM?
+        PinType  type : 4;  //!< Not type-safe.
+        PinValue value;
     };
 
     struct Data
@@ -101,6 +112,15 @@ public:
      * \brief Print out the contents of the ConfigBlock data in a human-readable form.
      */
     void cat();
+
+    /**
+     * \brief Allow caller to check whether pin is of a particular type.
+     * 
+     * Used by the initialization routines for the various pin types.
+     */
+    bool isPinType(uint8_t pin, PinType pinType);
+
+    uint8_t getDigitalOutputValue(uint8_t pin);
 
 private:
     Stream& serialOut;
