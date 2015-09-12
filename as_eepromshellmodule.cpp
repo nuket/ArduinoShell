@@ -142,7 +142,7 @@ void EepromShellModule::run(String rawCommand)
     serialOut.println(rawCommand);
 
     // Parse it.
-    CommandAndParams cp(rawCommand);
+    CommandAndParams cp(rawCommand, serialOut);
     // cp.print();
 
     if (cp.command.equals("p"))

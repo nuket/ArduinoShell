@@ -44,9 +44,6 @@ public:
     //! Shared Config Block.
     ConfigBlock& configBlock;
 
-    //! Specifies where defaults are stored in EEPROM.
-    // const uint32_t configBase;
-
     //! Sets up the digital I/O pins, using stored EEPROM defaults.
     void setup() override;
 

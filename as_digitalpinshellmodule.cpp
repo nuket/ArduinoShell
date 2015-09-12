@@ -36,28 +36,6 @@ DigitalPinShellModule::DigitalPinShellModule(ConfigBlock& configBlock, Stream& s
 
 void DigitalPinShellModule::setup()
 {
-    // Check the config block, and if the .id and .crc are valid,
-    // load the defaults and apply them.
-    EEPROM.get(configBase, config);
-
-    // Calculate the CRC of the config block, minus the .crc field
-    // i.e. clear .crc first, so that it is always 0 when doing the
-    // calculation.
-    const uint32_t storedCrc = config.crc;
-    config.crc = 0;
-    
-    crc_t crc = crc_init();
-    crc = crc_update(crc, (const uint8_t *) &config, sizeof(config));
-    crc = crc_finalize(crc);
-
-    // serialOut.println(crc, HEX);
-
-    if (MODULE_ID == config.id && crc == storedCrc)
-    {
-        // Process the configuration block, and set all of the I/O
-        // pins accordingly.
-        
-    }
 }
 
 const String& DigitalPinShellModule::help()
@@ -70,8 +48,8 @@ void DigitalPinShellModule::run(String rawCommand)
     serialOut.println(rawCommand);
 
     // Parse it.
-    CommandAndParams cp(rawCommand);
-    cp.print();
+    CommandAndParams cp(rawCommand, serialOut);
+    // cp.print();
 
     if (!cp.command.equals("pin")) return;
 
@@ -140,7 +118,8 @@ void DigitalPinShellModule::run(String rawCommand)
 
 void DigitalPinShellModule::saveDefaults()
 {
-    EEPROM.put(configBase, config);
+    // EEPROM.put(configBase, config);
+    configBlock.save();
 }
 
 //void DigitalPinShellModule::loadDefaults()

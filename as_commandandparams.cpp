@@ -23,9 +23,10 @@
 
 #include "as_commandandparams.h"
 
-CommandAndParams::CommandAndParams(String rawCommand) :
+CommandAndParams::CommandAndParams(String rawCommand, Stream& serialOut) :
     commandUsable(false),
-    paramCount(0)
+    paramCount(0),
+    serialOut(serialOut)
 {
     // Trim whitespace in place.
     rawCommand.trim();
@@ -55,8 +56,8 @@ CommandAndParams::CommandAndParams(String rawCommand) :
         spaceA++;
         spaceB = rawCommand.indexOf(' ', spaceA);
 
-//        Serial.println(spaceA);
-//        Serial.println(spaceB);
+//        serialOut.println(spaceA);
+//        serialOut.println(spaceB);
 
         if (spaceB == -1)
         {
@@ -76,24 +77,24 @@ CommandAndParams::CommandAndParams(String rawCommand) :
 
 void CommandAndParams::print()
 {
-    Serial.print("command:  >>");
-    Serial.print(command);
-    Serial.println("<<");
+    serialOut.print("command:  >>");
+    serialOut.print(command);
+    serialOut.println("<<");
     
     for (int i = 0; i < paramCount; i++)
     {
-        Serial.print("param[");
-        Serial.print(i);
-        Serial.print("]: >>");
-        Serial.print(params[i]);
-        Serial.println("<<");
+        serialOut.print("param[");
+        serialOut.print(i);
+        serialOut.print("]: >>");
+        serialOut.print(params[i]);
+        serialOut.println("<<");
     }
 }
 
 #if ENABLE_UNIT_TESTS
 static void test_command_and_params_class()
 {
-    Serial.println("CommandAndParams unit test starting.");
+    serialOut.println("CommandAndParams unit test starting.");
     
     CommandAndParams testA("test 1 2 3");
     testA.print();
@@ -112,7 +113,7 @@ static void test_command_and_params_class()
     assert(String("0x41").equals(testB.params[1]));
     assert(testB.paramCount == 2);
     
-    Serial.println("CommandAndParams unit test ending OK.");
+    serialOut.println("CommandAndParams unit test ending OK.");
 }
 #endif
 

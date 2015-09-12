@@ -28,9 +28,19 @@
 #ifndef __AS_CONFIGBLOCK_H__
 #define __AS_CONFIGBLOCK_H__
 
+#include <Arduino.h>
+#include <stdint.h>
+
 class ConfigBlock
 {
-    enum class PinType
+public:
+    //! 'CNFG' - used to identify the module config block in EEPROM.
+    static const uint32_t MODULE_ID = 0x434e4647;  
+
+    //! Maximum number of pins to configure.
+    static const uint8_t MAX_PINS = 64;
+
+    enum PinType
     {
         NO_TYPE              = 0,  //!< Don't bother configuring at setup time.
         DIGITAL_INPUT        = 1,
@@ -42,7 +52,22 @@ class ConfigBlock
         SERIAL_SOFTWARE      = 7,
         SERIAL_CAN           = 8,
         SERIAL_I2C           = 9,
-        SERIAL_SPI           = 10
+        SERIAL_SPI           = 10,
+        LAST_ENTRY
+    };
+
+    const char * PinTypeStrings[PinType::LAST_ENTRY] = {
+        "NO_TYPE",
+        "DIGITAL_INPUT",
+        "DIGITAL_INPUT_PULLUP",
+        "DIGITAL_OUTPUT",
+        "ANALOG_INPUT",
+        "PWM",
+        "SERIAL_HARDWARE",
+        "SERIAL_SOFTWARE",
+        "SERIAL_CAN",
+        "SERIAL_I2C",
+        "SERIAL_SPI"
     };
 
     struct PinConfig
@@ -53,15 +78,38 @@ class ConfigBlock
 
     struct Data
     {
-        PinConfig data[64];    
+        const uint32_t moduleId = MODULE_ID;
+        uint32_t       crc;
+
+        PinConfig data[MAX_PINS];
     };
+
+    //! Set the EEPROM config block base address.
+    ConfigBlock(uint32_t configBase, Stream& serialOut);
+
+    /** 
+     * \brief Save the data.
+     * 
+     * \return true if succeeded, false if not
+     */
+    bool save();
+
+    void setPinType(uint8_t pin, PinType pinType);
+    void setPinValue(uint8_t pin, uint32_t value);
+
+    /**
+     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
+     */
+    void cat();
+
+private:
+    Stream& serialOut;
 
     //! EEPROM location for storing config data.
     const uint32_t configBase;
 
-public:
-    //! Set the EEPROM config block base address.
-    ConfigBlock(const uint32_t configBase) : configBase(configBase) {}
+    //! Data block in RAM.
+    Data configBlock;
 };
 
 #endif  /* __AS_CONFIGBLOCK_H__ */
