@@ -27,6 +27,9 @@
 
 #include <EEPROM.h>
 
+namespace ArduinoShell
+{
+
 DigitalPinShellModule::DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut) :
     configBlock(configBlock),
     serialOut(serialOut)
@@ -119,8 +122,9 @@ void DigitalPinShellModule::run(String rawCommand)
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
                 pinMode(pin, OUTPUT);
-                
-                configBlock.setPinValue(pin, HIGH);
+
+                ConfigBlock::PinValue pinValue = { .digital = HIGH };
+                configBlock.setPinValue(pin, pinValue);
                 digitalWrite(pin, HIGH);
             }
             else
@@ -128,8 +132,9 @@ void DigitalPinShellModule::run(String rawCommand)
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
                 pinMode(pin, OUTPUT);
-                
-                configBlock.setPinValue(pin, LOW);
+
+                ConfigBlock::PinValue pinValue = { .digital = LOW };
+                configBlock.setPinValue(pin, pinValue);
                 digitalWrite(pin, LOW);
             }
         }
@@ -145,3 +150,4 @@ void DigitalPinShellModule::saveDefaults()
 //{   
 //}
 
+} // namespace ArduinoShell

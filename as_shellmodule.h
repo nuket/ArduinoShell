@@ -43,7 +43,7 @@ public:
      * the derived class, though this has an empty default
      * implementation in case nothing specific needs to happen.
      */
-    virtual void setup();
+    virtual void setup() {}
 
     /**
      * \brief Module help string goes here.
@@ -51,11 +51,15 @@ public:
      * This method can either choose to print the help string itself, 
      * or pass back a readonly reference that can be used by the caller,
      * or both.
+     * 
+     * Method is mandatory.
      */
     virtual const String& help() = 0;
 
     /**
      * \brief Command processing and execution goes here.
+     * 
+     * Method is mandatory.
      */
     virtual void run(String rawCommand) = 0;
 

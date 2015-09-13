@@ -21,45 +21,35 @@
     THE SOFTWARE.
 */
 
-/**
- * \file
- */
-
-#ifndef __AS_DIGITALPINSHELLMODULE_H__
-#define __AS_DIGITALPINSHELLMODULE_H__
+#ifndef __CONFIGSHELLMODULE_H__
+#define __CONFIGSHELLMODULE_H__
 
 #include "as_shellmodule.h"
+
+class Stream;
 
 namespace ArduinoShell
 {
 
 class ConfigBlock;
 
-/**
- * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
- */
-class DigitalPinShellModule : public ShellModule
+class ConfigShellModule : public ShellModule
 {
 private:
-    //! The serial output stream to send status and debugging messages.
-    Stream& serialOut;
-
-    //! Shared Config Block.
     ConfigBlock& configBlock;
+    Stream&      serialOut;
 public:
-    //! Sets up the digital I/O pins, using stored EEPROM defaults.
-    void setup() override;
+    ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut);
 
-    const String& help() override;
-    void run(String rawCommand) override;
+    const String& help() {}
+    void run(String rawCommand);
 
-    void saveDefaults();
-    // void loadDefaults() override;
-
-    //! Set the EEPROM config block base address and serial output port.
-    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
+    /**
+     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
+     */
+    // void cat();
 };
 
 } // namespace ArduinoShell
 
-#endif  /* __AS_DIGITALPINSHELLMODULE_H__ */
+#endif // __CONFIGSHELLMODULE_H__

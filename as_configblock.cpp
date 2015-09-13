@@ -25,9 +25,11 @@
 
 #include <EEPROM.h>
 
-ConfigBlock::ConfigBlock(uint32_t configBase, Stream& serialOut) : 
-    configBase(configBase),
-    serialOut(serialOut)
+namespace ArduinoShell
+{
+
+ConfigBlock::ConfigBlock(uint32_t configBase) : 
+    configBase(configBase)
 {
     // Read in the configuration from EEPROM.
     EEPROM.get(configBase, configBlock);
@@ -63,33 +65,18 @@ bool ConfigBlock::save()
     EEPROM.put(configBase, configBlock);
 }
 
-void ConfigBlock::cat()
-{
-    char output[80] = {0};
-    uint8_t type = 0;
-    
-    for (int i = 0; i < MAX_PINS; i++)
-    {
-        memset(output, 0, 80);
-        type = configBlock.data[i].type;
-        snprintf(output, 80, "Config for Pin %02d: %s", i, type < PinType::LAST_ENTRY ? PinTypeStrings[type] : "INVALID");
-        serialOut.println(output);
-    }
-}
-
 void ConfigBlock::setPinType(uint8_t pin, PinType pinType)
 {
     if (pin     >= MAX_PINS)            return;
     if (pinType >= PinType::LAST_ENTRY) return;
 
     configBlock.data[pin].type = pinType;
-    cat();
 }
 
-void ConfigBlock::setPinValue(uint8_t pin, uint32_t value)
+void ConfigBlock::setPinValue(uint8_t pin, const PinValue& value)
 {
     if (pin     >= MAX_PINS)              return;
-    if (!(HIGH == value || LOW == value)) return;
+    // if (!(HIGH == value || LOW == value)) return;
 
     configBlock.data[pin].value = value;
 }
@@ -102,3 +89,4 @@ bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
     return (configBlock.data[pin].type == pinType);
 }
 
+} // namespace ArduinoShell

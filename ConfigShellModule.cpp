@@ -21,45 +21,45 @@
     THE SOFTWARE.
 */
 
-/**
- * \file
- */
+#include "as_commandandparams.h"
+#include "ConfigShellModule.h"
 
-#ifndef __AS_DIGITALPINSHELLMODULE_H__
-#define __AS_DIGITALPINSHELLMODULE_H__
-
-#include "as_shellmodule.h"
-
-namespace ArduinoShell
+namespace ArduinoShell 
 {
 
-class ConfigBlock;
-
-/**
- * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
- */
-class DigitalPinShellModule : public ShellModule
+ConfigShellModule::ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut) :
+    configBlock(configBlock),
+    serialOut(serialOut)
 {
-private:
-    //! The serial output stream to send status and debugging messages.
-    Stream& serialOut;
+}
 
-    //! Shared Config Block.
-    ConfigBlock& configBlock;
-public:
-    //! Sets up the digital I/O pins, using stored EEPROM defaults.
-    void setup() override;
+void ConfigShellModule::run(String rawCommand)
+{
+    // Echo the command.
+    serialOut.println(rawCommand);
 
-    const String& help() override;
-    void run(String rawCommand) override;
+    // Parse it.
+    CommandAndParams cp(rawCommand, serialOut);
+    cp.print();
 
-    void saveDefaults();
-    // void loadDefaults() override;
+    if (!cp.command.equals("config")) return;
 
-    //! Set the EEPROM config block base address and serial output port.
-    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
-};
+    
+}
 
+//void ConfigShellModule::cat()
+//{
+//    char output[80] = {0};
+//    uint8_t type = 0;
+//    
+//    for (int i = 0; i < MAX_PINS; i++)
+//    {
+//        memset(output, 0, 80);
+//        type = configBlock.data[i].type;
+//        snprintf(output, 80, "Config for Pin %02d: %s", i, type < PinType::LAST_ENTRY ? PinTypeStrings[type] : "INVALID");
+//        serialOut.println(output);
+//    }
+//}
+    
 } // namespace ArduinoShell
 
-#endif  /* __AS_DIGITALPINSHELLMODULE_H__ */

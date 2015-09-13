@@ -28,8 +28,10 @@
 #ifndef __AS_CONFIGBLOCK_H__
 #define __AS_CONFIGBLOCK_H__
 
-#include <Arduino.h>
 #include <stdint.h>
+
+namespace ArduinoShell
+{
 
 class ConfigBlock
 {
@@ -72,8 +74,8 @@ public:
 
     union PinValue
     {
-        uint8_t  digital;     //!< HIGH / LOW for DIGITAL_OUTPUT
-        uint32_t pwm;       //!< 0 - 255 for PWM
+        uint8_t  digital;      //!< HIGH / LOW for DIGITAL_OUTPUT
+        uint32_t pwm;          //!< 0 - 255 for PWM
         struct
         {
             uint32_t baud;     //!< Baudrate 9600 - 115200
@@ -96,7 +98,7 @@ public:
     };
 
     //! Set the EEPROM config block base address.
-    ConfigBlock(uint32_t configBase, Stream& serialOut);
+    ConfigBlock(uint32_t configBase);
 
     /** 
      * \brief Save the data.
@@ -105,13 +107,8 @@ public:
      */
     bool save();
 
-    void setPinType(uint8_t pin, PinType pinType);
-    void setPinValue(uint8_t pin, uint32_t value);
-
-    /**
-     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
-     */
-    void cat();
+    void setPinType (uint8_t pin, PinType pinType);
+    void setPinValue(uint8_t pin, const PinValue& value);
 
     /**
      * \brief Allow caller to check whether pin is of a particular type.
@@ -123,13 +120,13 @@ public:
     uint8_t getDigitalOutputValue(uint8_t pin);
 
 private:
-    Stream& serialOut;
-
     //! EEPROM location for storing config data.
     const uint32_t configBase;
 
     //! Data block in RAM.
     Data configBlock;
 };
+
+} // namespace ArduinoShell
 
 #endif  /* __AS_CONFIGBLOCK_H__ */
