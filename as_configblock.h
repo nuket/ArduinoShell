@@ -58,7 +58,7 @@ public:
         LAST_ENTRY
     };
 
-    const char * PinTypeStrings[PinType::LAST_ENTRY] = {
+    static constexpr const char * PinTypeStrings[PinType::LAST_ENTRY] = {
         "NO_TYPE",
         "DIGITAL_INPUT",
         "DIGITAL_INPUT_PULLUP",
@@ -120,6 +120,8 @@ public:
     uint8_t getDigitalOutputValue(uint8_t pin);
 
 private:
+    friend class ConfigShellModule;
+
     //! EEPROM location for storing config data.
     const uint32_t configBase;
 

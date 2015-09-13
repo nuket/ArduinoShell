@@ -47,7 +47,7 @@ public:
     /**
      * \brief Print out the contents of the ConfigBlock data in a human-readable form.
      */
-    // void cat();
+    void print();
 };
 
 } // namespace ArduinoShell

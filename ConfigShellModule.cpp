@@ -22,6 +22,7 @@
 */
 
 #include "as_commandandparams.h"
+#include "as_configblock.h"
 #include "ConfigShellModule.h"
 
 namespace ArduinoShell 
@@ -44,22 +45,30 @@ void ConfigShellModule::run(String rawCommand)
 
     if (!cp.command.equals("config")) return;
 
-    
+    if (cp.params[0].equals("save"))
+    {
+        
+    }
+    else
+    if (cp.params[0].equals("print"))
+    {
+        
+    }
 }
 
-//void ConfigShellModule::cat()
-//{
-//    char output[80] = {0};
-//    uint8_t type = 0;
-//    
-//    for (int i = 0; i < MAX_PINS; i++)
-//    {
-//        memset(output, 0, 80);
-//        type = configBlock.data[i].type;
-//        snprintf(output, 80, "Config for Pin %02d: %s", i, type < PinType::LAST_ENTRY ? PinTypeStrings[type] : "INVALID");
-//        serialOut.println(output);
-//    }
-//}
+void ConfigShellModule::print()
+{
+    char output[80] = {0};
+    uint8_t type = 0;
+    
+    for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
+    {
+        memset(output, 0, 80);
+        type = configBlock.configBlock.data[i].type;
+        snprintf(output, 80, "Config for Pin %02d: %s", i, type < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[type] : "INVALID");
+        serialOut.println(output);
+    }
+}
     
 } // namespace ArduinoShell
 
