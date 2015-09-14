@@ -41,6 +41,32 @@ Config for Pin 63: NO_TYPE
 The config system does not do any checking whether the pins actually 
 exist on your Arduino, so be careful.
 
+### `config save`
+
+Saves the configuration to EEPROM with a CRC checksum of the pin 
+configuration.
+
+### `pin <n> in`
+
+Sets the pin to `INPUT` mode and that's all.
+
+### `pin <n> in_pullup`
+
+Sets the pin to `INPUT_PULLUP` mode and that's all.
+
+### `pin <n> high`
+
+Sets the pin to `OUTPUT` mode and sets the voltage level to `HIGH`.
+
+### `pin <n> low`
+
+Sets the pin to `OUTPUT` mode and sets the voltage level to `LOW`.
+
+### `pin <n> reset`
+
+Resets the pin to `NO_TYPE` mode, which means that when the Arduino
+is reset, there is no configuration performed on this pin.
+
 ### `wb address byte`
 
 Write the `byte` to the specified EEPROM `address`.
