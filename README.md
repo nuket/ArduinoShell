@@ -1,8 +1,14 @@
 # Arduino Shell
+
 A command shell to interact with built-in Arduino features via the Serial Monitor.
 
-Right now: Offers commands to print EEPROM contents in a hexdump-like form, and to write 
-bytes into EEPROM. Other commands will be added, as needed.
+Right now it offers commands:
+
+* to print EEPROM contents in a hexdump-like form
+* to write bytes into EEPROM
+* to configure the pins for digital I/O mode
+* to save the pin configuration to EEPROM
+* to print the current pin configuration
 
 Also useful, a super-simple command parser class that breaks a raw input string into 
 a command and parameters, which can then be used by other logic to determine the 
@@ -10,9 +16,30 @@ next steps.
 
 ## Startup
 
-At startup, the Arduino Shell will print the full contents of EEPROM.
+At startup, the saved pin configuration is reloaded and digital I/O pins are restored
+to their last HIGH or LOW voltage level.
 
 ## Command Examples
+
+### `config print`
+
+Prints the currently running pin configuration, like so:
+
+```
+config print
+ConfigBlock CRC: 0000b2b1
+Config for Pin 00: DIGITAL_INPUT
+Config for Pin 01: DIGITAL_OUTPUT_HIGH
+Config for Pin 02: DIGITAL_INPUT_PULLUP
+Config for Pin 03: DIGITAL_OUTPUT_LOW
+[...]
+Config for Pin 61: NO_TYPE
+Config for Pin 62: NO_TYPE
+Config for Pin 63: NO_TYPE
+```
+
+The config system does not do any checking whether the pins actually 
+exist on your Arduino, so be careful.
 
 ### `wb address byte`
 
