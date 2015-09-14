@@ -36,9 +36,6 @@ ConfigShellModule::ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut
 
 void ConfigShellModule::run(String rawCommand)
 {
-    // Echo the command.
-    serialOut.println(rawCommand);
-
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
     // cp.print();

@@ -141,9 +141,6 @@ void EepromShellModule::printContents(uint32_t startAddress, uint32_t length)
 
 void EepromShellModule::run(String rawCommand)
 {
-    // Echo the command.
-    serialOut.println(rawCommand);
-
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
     // cp.print();

@@ -73,12 +73,9 @@ const String& DigitalPinShellModule::help()
 
 void DigitalPinShellModule::run(String rawCommand)
 {
-    // Echo the command.
-    serialOut.println(rawCommand);
-
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
-    cp.print();
+    // cp.print();
 
     if (!cp.command.equals("pin")) return;
 

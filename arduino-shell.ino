@@ -81,6 +81,7 @@ void loop()
     if (millis() % 1000 == 0 && Serial.available())
     {
         String command = Serial.readStringUntil(TERMINATOR);
+        Serial.println(command);
 
         configShell.run(command);
         digitalPinShell.run(command);
