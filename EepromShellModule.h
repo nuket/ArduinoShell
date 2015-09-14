@@ -25,43 +25,35 @@
  * \file
  */
 
-#ifndef __AS_CONFIGBLOCK_H__
-#define __AS_CONFIGBLOCK_H__
+#ifndef __EEPROMSHELLMODULE_H__
+#define __EEPROMSHELLMODULE_H__
 
-class ConfigBlock
+#include "ShellModule.h"
+
+namespace ArduinoShell
 {
-    enum PinType
-    {
-        NO_TYPE              = 0,  //!< Don't bother configuring at setup time.
-        DIGITAL_INPUT        = 1,
-        DIGITAL_INPUT_PULLUP = 2,
-        DIGITAL_OUTPUT       = 3,
-        ANALOG_INPUT         = 4,
-        PWM                  = 5,
-        SERIAL_HARDWARE      = 6,
-        SERIAL_SOFTWARE      = 7,
-        SERIAL_CAN           = 8,
-        SERIAL_I2C           = 9,
-        SERIAL_SPI           = 10
-    };
 
-    struct PinConfig
-    {
-        int type  : 4;  //!< Not type-safe.
-        int value;      //!< Starting value, 0 / 1 for DIGITAL_OUTPUT, 0 - 255 for PWM?
-    };
-
-    struct Data
-    {
-        PinConfig data[64];    
-    };
-
-    //! EEPROM location for storing config data.
-    const uint32_t configBase;
-
+class EepromShellModule : public ShellModule
+{
+    Stream& serialOut;
+    
+    /**
+     * Prints the contents of EEPROM from startAddress to startAddress + length.
+     * 
+     * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
+     * 
+     * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
+     * to the next-lower block size.
+     */
+    void printContents(uint32_t startAddress, uint32_t length);
 public:
-    //! Set the EEPROM config block base address.
-    ConfigBlock(const uint32_t configBase) : configBase(configBase) {}
+    void setup() override;
+    const String& help() override;
+    void run(String rawCommand) override;
+
+    EepromShellModule(Stream& serialOut);
 };
 
-#endif  /* __AS_CONFIGBLOCK_H__ */
+} // namespace ArduinoShell
+
+#endif // __EEPROMSHELLMODULE_H__

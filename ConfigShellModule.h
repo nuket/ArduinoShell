@@ -21,34 +21,35 @@
     THE SOFTWARE.
 */
 
-/**
- * \file
- */
+#ifndef __CONFIGSHELLMODULE_H__
+#define __CONFIGSHELLMODULE_H__
 
-#ifndef __AS_EEPROMSHELLMODULE_H__
-#define __AS_EEPROMSHELLMODULE_H__
+#include "ShellModule.h"
 
-#include "as_shellmodule.h"
+class Stream;
 
-class EepromShellModule : public ShellModule
+namespace ArduinoShell
 {
-    Stream& serialOut;
-    
-    /**
-     * Prints the contents of EEPROM from startAddress to startAddress + length.
-     * 
-     * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
-     * 
-     * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
-     * to the next-lower block size.
-     */
-    void printContents(uint32_t startAddress, uint32_t length);
-public:
-    void setup() override;
-    const String& help() override;
-    void run(String rawCommand) override;
 
-    EepromShellModule(Stream& serialOut);
+class ConfigBlock;
+
+class ConfigShellModule : public ShellModule
+{
+private:
+    ConfigBlock& configBlock;
+    Stream&      serialOut;
+public:
+    ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut);
+
+    const String& help() {}
+    void run(String rawCommand);
+
+    /**
+     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
+     */
+    void print();
 };
 
-#endif // __AS_EEPROMSHELLMODULE_H__
+} // namespace ArduinoShell
+
+#endif // __CONFIGSHELLMODULE_H__

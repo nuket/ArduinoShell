@@ -25,54 +25,40 @@
  * \file
  */
 
-#ifndef __AS_DIGITALPINSHELLMODULE_H__
-#define __AS_DIGITALPINSHELLMODULE_H__
+#ifndef __DIGITALPINSHELLMODULE_H__
+#define __DIGITALPINSHELLMODULE_H__
 
-#include "as_shellmodule.h"
+#include "ShellModule.h"
+
+namespace ArduinoShell
+{
+
+class ConfigBlock;
 
 /**
  * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
  */
 class DigitalPinShellModule : public ShellModule
 {
+private:
+    //! The serial output stream to send status and debugging messages.
+    Stream& serialOut;
+
+    //! Shared Config Block.
+    ConfigBlock& configBlock;
 public:
-    static const uint32_t MODULE_ID = 0x4450534d; //!< 'DPSM' - used to identify the module config block in EEPROM.
-    static const uint8_t  MAX_PINS  = 64;
-
-    //! Specifies where defaults are stored in EEPROM.
-    const uint32_t configBase;
-
     //! Sets up the digital I/O pins, using stored EEPROM defaults.
     void setup() override;
 
     const String& help() override;
     void run(String rawCommand) override;
 
-    void saveDefaults();
     // void loadDefaults() override;
 
-private:
-    struct
-    {
-        uint32_t id;     //!< MODULE_ID needs to be stored here in EEPROM, or the config block SHOULD NOT BE USED.
-        uint32_t crc;    //!< Currently using a 16-bit CRC, can shrink this field for other uses if needed.
-
-        uint64_t io;     //!< INPUT = (0 << pin), OUTPUT = (1 << pin)
-        uint64_t pullup; //!< INPUT_PULLUP means set this = (1 << pin), when necessary and input has (0 << pin).
-        uint64_t value;  //!< HIGH or LOW.
-    } config;
-
-    //! The serial output stream to send status and debugging messages.
-    Stream& serialOut;
-
-    //! Wrapper for pinMode, to set bits in config block.
-    void configPinMode (const uint8_t pin, const int mode);
-
-    //! Wrapper for digitalWrite, to set bits in config block.
-    void configPinValue(const uint8_t pin, const int value);
-public:
-    //! Set the EEPROM config block base address and serial output port.
-    DigitalPinShellModule(const uint32_t configBase, Stream& serialOut = Serial);
+    //! Dependency-inject the config block and serial output port.
+    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
 
-#endif  /* __AS_DIGITALPINSHELLMODULE_H__ */
+} // namespace ArduinoShell
+
+#endif  /* __DIGITALPINSHELLMODULE_H__ */

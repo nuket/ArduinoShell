@@ -23,10 +23,11 @@
 
 // #define ENABLE_UNIT_TESTS 0
 
-#include "as_commandandparams.h"
-#include "as_crc.h"
-#include "as_digitalpinshellmodule.h"
-#include "as_eepromshellmodule.h"
+#include "ConfigBlock.h"
+#include "ConfigShellModule.h"
+#include "Crc.h"
+#include "DigitalPinShellModule.h"
+#include "EepromShellModule.h"
 
 // Arduino IDE issue:
 // This include has to remain in place, otherwise for some reason
@@ -35,11 +36,22 @@
 #include <EEPROM.h>
 
 // -----------------------------------------------------------------------
+// Imports
+// -----------------------------------------------------------------------
+
+using ArduinoShell::ConfigBlock;
+using ArduinoShell::ConfigShellModule;
+using ArduinoShell::DigitalPinShellModule;
+using ArduinoShell::EepromShellModule;
+
+// -----------------------------------------------------------------------
 // Globals
 // -----------------------------------------------------------------------
 
-DigitalPinShellModule digitalPinShell(0x0100);
-EepromShellModule     eepromShell(Serial);
+ConfigBlock             configBlock(0x0000);
+ConfigShellModule       configShell(configBlock, Serial);
+DigitalPinShellModule   digitalPinShell(configBlock, Serial);
+EepromShellModule       eepromShell(Serial);
 
 // -----------------------------------------------------------------------
 // main()
@@ -51,14 +63,14 @@ void setup()
 
     Serial.println("Arduino Shell");
     Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
-    Serial.println("");
+    Serial.println();
 
     digitalPinShell.setup();
-    eepromShell.setup();
+//    eepromShell.setup();
 
-#if ENABLE_UNIT_TESTS
-    test_command_and_params_class();
-#endif
+//#if ENABLE_UNIT_TESTS
+//    test_command_and_params_class();
+//#endif
 }
 
 void loop() 
@@ -69,7 +81,8 @@ void loop()
     if (millis() % 1000 == 0 && Serial.available())
     {
         String command = Serial.readStringUntil(TERMINATOR);
-        
+
+        configShell.run(command);
         digitalPinShell.run(command);
         eepromShell.run(command);
     }
