@@ -42,6 +42,7 @@
 
 using ArduinoShell::ConfigBlock;
 using ArduinoShell::ConfigShellModule;
+using ArduinoShell::DigitalPinShellModule;
 
 // -----------------------------------------------------------------------
 // Globals
@@ -50,7 +51,7 @@ using ArduinoShell::ConfigShellModule;
 ConfigBlock             configBlock(0x0000);
 ConfigShellModule       configShell(configBlock, Serial);
 // DigitalPinShellModule   digitalPinShell(configBlock, Serial);
-// EepromShellModule     eepromShell(serialOut);
+EepromShellModule       eepromShell(Serial);
 
 // -----------------------------------------------------------------------
 // main()
@@ -84,7 +85,8 @@ void loop()
     {
         String command = Serial.readStringUntil(TERMINATOR);
 
-//        digitalPinShell.run(command);
-//        eepromShell.run(command);
+        configShell.run(command);
+        // digitalPinShell.run(command);
+        eepromShell.run(command);
     }
 }

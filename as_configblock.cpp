@@ -22,6 +22,7 @@
 */
 
 #include "as_configblock.h"
+#include "as_crc.h"
 
 #include <EEPROM.h>
 
@@ -60,8 +61,12 @@ ConfigBlock::ConfigBlock(uint32_t configBase) :
 
 bool ConfigBlock::save()
 {
-    // Calculate the CRC for the config block, and save it to EEPROM.
-    
+    crc_t crc = crc_init();
+    crc = crc_update(crc, (const uint8_t *) configBlock.data, sizeof(*configBlock.data));
+    crc = crc_finalize(crc);
+
+    configBlock.crc = crc;
+
     EEPROM.put(configBase, configBlock);
 }
 
@@ -88,5 +93,7 @@ bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
 
     return (configBlock.data[pin].type == pinType);
 }
+
+constexpr const char * ConfigBlock::PinTypeStrings[PinType::LAST_ENTRY];
 
 } // namespace ArduinoShell

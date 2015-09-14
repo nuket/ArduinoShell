@@ -38,7 +38,7 @@ struct CommandAndParams
     
     enum { MAX_PARAMS = 8 };
 
-    String  params[MAX_PARAMS];            //!< Up to MAX_PARAM parsed parameters are stored here.
+    String  params[MAX_PARAMS];            //!< Up to MAX_PARAMS parsed parameters are stored here.
     uint8_t paramCount;                    //!< Number of parameters actually parsed.
 
     Stream& serialOut;                     //!< Debug output is printed here.
