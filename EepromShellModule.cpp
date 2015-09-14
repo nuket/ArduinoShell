@@ -21,8 +21,8 @@
     THE SOFTWARE.
 */
 
-#include "as_commandandparams.h"
-#include "as_eepromshellmodule.h"
+#include "CommandAndParams.h"
+#include "EepromShellModule.h"
 
 #include <EEPROM.h>
 
@@ -32,6 +32,9 @@
 
 #define EEPROM_ROW_LENGTH 16
 #define OUTPUT_ROW_LENGTH 80
+
+namespace ArduinoShell
+{
 
 EepromShellModule::EepromShellModule(Stream& serialOut) :
     serialOut(serialOut)
@@ -207,3 +210,4 @@ void EepromShellModule::run(String rawCommand)
     }
 }
 
+} // namespace ArduinoShell

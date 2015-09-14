@@ -25,41 +25,44 @@
  * \file
  */
 
-#ifndef __AS_DIGITALPINSHELLMODULE_H__
-#define __AS_DIGITALPINSHELLMODULE_H__
+#ifndef __COMMANDANDPARAMS_H__
+#define __COMMANDANDPARAMS_H__
 
-#include "as_shellmodule.h"
+#include <Arduino.h>
 
 namespace ArduinoShell
 {
 
-class ConfigBlock;
-
 /**
- * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
+ * \class CommandAndParams
+ * \brief Simple container to parse a command and parameters out of a String.
  */
-class DigitalPinShellModule : public ShellModule
+struct CommandAndParams
 {
-private:
-    //! The serial output stream to send status and debugging messages.
-    Stream& serialOut;
+    String command;                        //!< The command to be performed.
+    bool   commandUsable;                  //!< Was a command available in the input string?
+    
+    enum { MAX_PARAMS = 8 };
 
-    //! Shared Config Block.
-    ConfigBlock& configBlock;
-public:
-    //! Sets up the digital I/O pins, using stored EEPROM defaults.
-    void setup() override;
+    String  params[MAX_PARAMS];            //!< Up to MAX_PARAMS parsed parameters are stored here.
+    uint8_t paramCount;                    //!< Number of parameters actually parsed.
 
-    const String& help() override;
-    void run(String rawCommand) override;
+    Stream& serialOut;                     //!< Debug output is printed here.
 
-    void saveDefaults();
-    // void loadDefaults() override;
+    /**
+     * Ctor.
+     * 
+     * \param rawCommand  A raw string to parse for a command and parameters.
+     */
+    CommandAndParams(String rawCommand, Stream& serialOut);
 
-    //! Set the EEPROM config block base address and serial output port.
-    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
+    /**
+     * Prints the parsed command and params.
+     * Uses #serialOut as its target.
+     */
+    void print();
 };
 
 } // namespace ArduinoShell
 
-#endif  /* __AS_DIGITALPINSHELLMODULE_H__ */
+#endif // __COMMANDANDPARAMS_H__

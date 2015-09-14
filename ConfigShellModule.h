@@ -24,7 +24,7 @@
 #ifndef __CONFIGSHELLMODULE_H__
 #define __CONFIGSHELLMODULE_H__
 
-#include "as_shellmodule.h"
+#include "ShellModule.h"
 
 class Stream;
 

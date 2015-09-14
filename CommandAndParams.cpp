@@ -21,7 +21,10 @@
     THE SOFTWARE.
 */
 
-#include "as_commandandparams.h"
+#include "CommandAndParams.h"
+
+namespace ArduinoShell
+{
 
 CommandAndParams::CommandAndParams(String rawCommand, Stream& serialOut) :
     commandUsable(false),
@@ -116,4 +119,6 @@ static void test_command_and_params_class()
     serialOut.println("CommandAndParams unit test ending OK.");
 }
 #endif
+
+} // namespace ArduinoShell
 

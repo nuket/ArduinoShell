@@ -23,12 +23,11 @@
 
 // #define ENABLE_UNIT_TESTS 0
 
+#include "ConfigBlock.h"
 #include "ConfigShellModule.h"
-#include "as_commandandparams.h"
-#include "as_configblock.h"
-#include "as_crc.h"
-#include "as_digitalpinshellmodule.h"
-#include "as_eepromshellmodule.h"
+#include "Crc.h"
+#include "DigitalPinShellModule.h"
+#include "EepromShellModule.h"
 
 // Arduino IDE issue:
 // This include has to remain in place, otherwise for some reason
@@ -43,6 +42,7 @@
 using ArduinoShell::ConfigBlock;
 using ArduinoShell::ConfigShellModule;
 using ArduinoShell::DigitalPinShellModule;
+using ArduinoShell::EepromShellModule;
 
 // -----------------------------------------------------------------------
 // Globals
@@ -50,7 +50,7 @@ using ArduinoShell::DigitalPinShellModule;
 
 ConfigBlock             configBlock(0x0000);
 ConfigShellModule       configShell(configBlock, Serial);
-// DigitalPinShellModule   digitalPinShell(configBlock, Serial);
+DigitalPinShellModule   digitalPinShell(configBlock, Serial);
 EepromShellModule       eepromShell(Serial);
 
 // -----------------------------------------------------------------------
@@ -86,7 +86,7 @@ void loop()
         String command = Serial.readStringUntil(TERMINATOR);
 
         configShell.run(command);
-        // digitalPinShell.run(command);
+        digitalPinShell.run(command);
         eepromShell.run(command);
     }
 }

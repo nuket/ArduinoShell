@@ -25,35 +25,51 @@
  * \file
  */
 
+#ifndef __SHELLMODULE_H__
+#define __SHELLMODULE_H__
+
 #include <Arduino.h>
 
 /**
- * \class CommandAndParams
- * \brief Simple container to parse a command and parameters out of a String.
+ * Declares the interface that all shell modules implement.
  */
-struct CommandAndParams
+class ShellModule
 {
-    String command;                        //!< The command to be performed.
-    bool   commandUsable;                  //!< Was a command available in the input string?
-    
-    enum { MAX_PARAMS = 8 };
-
-    String  params[MAX_PARAMS];            //!< Up to MAX_PARAMS parsed parameters are stored here.
-    uint8_t paramCount;                    //!< Number of parameters actually parsed.
-
-    Stream& serialOut;                     //!< Debug output is printed here.
-
+public:
     /**
-     * Ctor.
+     * \brief Module initialization code goes here.
      * 
-     * \param rawCommand  A raw string to parse for a command and parameters.
+     * Setup actions specific to the module should be handled by
+     * the derived class, though this has an empty default
+     * implementation in case nothing specific needs to happen.
      */
-    CommandAndParams(String rawCommand, Stream& serialOut);
+    virtual void setup() {}
 
     /**
-     * Prints the parsed command and params.
-     * Uses #serialOut as its target.
+     * \brief Module help string goes here.
+     * 
+     * This method can either choose to print the help string itself, 
+     * or pass back a readonly reference that can be used by the caller,
+     * or both.
+     * 
+     * Method is mandatory.
      */
-    void print();
+    virtual const String& help() = 0;
+
+    /**
+     * \brief Command processing and execution goes here.
+     * 
+     * Method is mandatory.
+     */
+    virtual void run(String rawCommand) = 0;
+
+    /**
+     * \brief Default settings can be persisted here in an arbitrary format.
+     */
+    // virtual void saveDefaults();
+
+    //! Default settings are loaded here.
+    // virtual void loadDefaults();
 };
 
+#endif // __SHELLMODULE_H__

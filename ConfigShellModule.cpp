@@ -21,8 +21,8 @@
     THE SOFTWARE.
 */
 
-#include "as_commandandparams.h"
-#include "as_configblock.h"
+#include "CommandAndParams.h"
+#include "ConfigBlock.h"
 #include "ConfigShellModule.h"
 
 namespace ArduinoShell 
@@ -61,13 +61,13 @@ void ConfigShellModule::print()
     char output[80] = {0};
     uint8_t type = 0;
 
-    snprintf(output, 80, "ConfigBlock CRC: %08x", configBlock.configBlock.crc);
+    snprintf(output, 80, "ConfigBlock CRC: %08x", configBlock.data.crc);
     serialOut.println(output);
     
     for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
     {
         memset(output, 0, 80);
-        type = configBlock.configBlock.data[i].type;
+        type = configBlock.data.pinConfig[i].type;
         snprintf(output, 80, "Config for Pin %02d: %s", i, type < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[type] : "NOT CONFIGURED");
         serialOut.println(output);
     }

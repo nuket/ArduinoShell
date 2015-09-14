@@ -25,30 +25,41 @@
  * \file
  */
 
-#ifndef __AS_EEPROMSHELLMODULE_H__
-#define __AS_EEPROMSHELLMODULE_H__
+#ifndef __DIGITALPINSHELLMODULE_H__
+#define __DIGITALPINSHELLMODULE_H__
 
-#include "as_shellmodule.h"
+#include "ShellModule.h"
 
-class EepromShellModule : public ShellModule
+namespace ArduinoShell
 {
+
+class ConfigBlock;
+
+/**
+ * \brief Manipulate the digital I/O pins, and save the config to EEPROM.
+ */
+class DigitalPinShellModule : public ShellModule
+{
+private:
+    //! The serial output stream to send status and debugging messages.
     Stream& serialOut;
-    
-    /**
-     * Prints the contents of EEPROM from startAddress to startAddress + length.
-     * 
-     * Works best with multiples of EEPROM_ROW_LENGTH (16) byte-sized blocks.
-     * 
-     * Will not print less than EEPROM_ROW_LENGTH bytes, and will round down
-     * to the next-lower block size.
-     */
-    void printContents(uint32_t startAddress, uint32_t length);
+
+    //! Shared Config Block.
+    ConfigBlock& configBlock;
 public:
+    //! Sets up the digital I/O pins, using stored EEPROM defaults.
     void setup() override;
+
     const String& help() override;
     void run(String rawCommand) override;
 
-    EepromShellModule(Stream& serialOut);
+    void saveDefaults();
+    // void loadDefaults() override;
+
+    //! Set the EEPROM config block base address and serial output port.
+    DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
 
-#endif // __AS_EEPROMSHELLMODULE_H__
+} // namespace ArduinoShell
+
+#endif  /* __DIGITALPINSHELLMODULE_H__ */

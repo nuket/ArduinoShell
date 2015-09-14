@@ -21,10 +21,11 @@
     THE SOFTWARE.
 */
 
-#include "as_configblock.h"
-#include "as_crc.h"
+#include "ConfigBlock.h"
+#include "Crc.h"
 
 #include <EEPROM.h>
+#include <string.h>
 
 namespace ArduinoShell
 {
@@ -32,42 +33,38 @@ namespace ArduinoShell
 ConfigBlock::ConfigBlock(uint32_t configBase) : 
     configBase(configBase)
 {
+    Data eepromConfigData;
+    
     // Read in the configuration from EEPROM.
-    EEPROM.get(configBase, configBlock);
+    EEPROM.get(configBase, eepromConfigData);
 
-//    // Check the config block, and if the .id and .crc are valid,
-//    // load the defaults and apply them.
-//    // EEPROM.get(configBase, config);
-//
-//    // Calculate the CRC of the config block, minus the .crc field
-//    // i.e. clear .crc first, so that it is always 0 when doing the
-//    // calculation.
-//    const uint32_t storedCrc = config.crc;
-//    config.crc = 0;
-//    
-//    crc_t crc = crc_init();
-//    crc = crc_update(crc, (const uint8_t *) &config, sizeof(config));
-//    crc = crc_finalize(crc);
-//
-//    // serialOut.println(crc, HEX);
-//
-//    if (MODULE_ID == config.id && crc == storedCrc)
-//    {
-//        // Process the configuration block, and set all of the I/O
-//        // pins accordingly.
-//        
-//    }
+    // Check the stored module ID and see if it is correct.
+    if (MODULE_ID != eepromConfigData.moduleId)
+    {
+        return;
+    }
+
+    // Calculate the ConfigBlock CRC.
+
+    crc_t crc = crc_init();
+    crc = crc_update(crc, (const uint8_t *) eepromConfigData.pinConfig, sizeof(PinConfig) * MAX_PINS);
+    crc = crc_finalize(crc);
+
+    if (crc == eepromConfigData.crc)
+    {
+        memcpy(data.pinConfig, eepromConfigData.pinConfig, sizeof(PinConfig) * MAX_PINS);
+    }
 }
 
 bool ConfigBlock::save()
 {
     crc_t crc = crc_init();
-    crc = crc_update(crc, (const uint8_t *) configBlock.data, sizeof(*configBlock.data));
+    crc = crc_update(crc, (const uint8_t *) data.pinConfig, sizeof(PinConfig) * MAX_PINS);
     crc = crc_finalize(crc);
 
-    configBlock.crc = crc;
+    data.crc = crc;
 
-    EEPROM.put(configBase, configBlock);
+    EEPROM.put(configBase, data);
 }
 
 void ConfigBlock::setPinType(uint8_t pin, PinType pinType)
@@ -75,7 +72,7 @@ void ConfigBlock::setPinType(uint8_t pin, PinType pinType)
     if (pin     >= MAX_PINS)            return;
     if (pinType >= PinType::LAST_ENTRY) return;
 
-    configBlock.data[pin].type = pinType;
+    data.pinConfig[pin].type = pinType;
 }
 
 void ConfigBlock::setPinValue(uint8_t pin, const PinValue& value)
@@ -83,7 +80,7 @@ void ConfigBlock::setPinValue(uint8_t pin, const PinValue& value)
     if (pin     >= MAX_PINS)              return;
     // if (!(HIGH == value || LOW == value)) return;
 
-    configBlock.data[pin].value = value;
+    data.pinConfig[pin].value = value;
 }
 
 bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
@@ -91,7 +88,7 @@ bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
     if (pin     >= MAX_PINS)            return false;
     if (pinType >= PinType::LAST_ENTRY) return false;
 
-    return (configBlock.data[pin].type == pinType);
+    return (data.pinConfig[pin].type == pinType);
 }
 
 constexpr const char * ConfigBlock::PinTypeStrings[PinType::LAST_ENTRY];

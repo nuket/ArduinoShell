@@ -21,9 +21,9 @@
     THE SOFTWARE.
 */
 
-#include "as_commandandparams.h"
-#include "as_configblock.h"
-#include "as_digitalpinshellmodule.h"
+#include "CommandAndParams.h"
+#include "ConfigBlock.h"
+#include "DigitalPinShellModule.h"
 
 #include <EEPROM.h>
 
@@ -81,6 +81,7 @@ void DigitalPinShellModule::run(String rawCommand)
     // Examples: pin 8 in
     //           pin 8 out
     //           pin 8 in_pullup
+    //           pin 8 disable
     //           pin 8 high
     //           pin 8 low
     if (cp.paramCount == 2)

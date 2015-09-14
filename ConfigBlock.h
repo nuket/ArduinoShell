@@ -25,8 +25,8 @@
  * \file
  */
 
-#ifndef __AS_CONFIGBLOCK_H__
-#define __AS_CONFIGBLOCK_H__
+#ifndef __CONFIGBLOCK_H__
+#define __CONFIGBLOCK_H__
 
 #include <stdint.h>
 
@@ -94,7 +94,9 @@ public:
         const uint32_t moduleId = MODULE_ID;
         uint32_t       crc;
 
-        PinConfig data[MAX_PINS];
+        PinConfig      pinConfig[MAX_PINS];
+
+        
     };
 
     //! Set the EEPROM config block base address.
@@ -126,9 +128,9 @@ private:
     const uint32_t configBase;
 
     //! Data block in RAM.
-    Data configBlock;
+    Data data;
 };
 
 } // namespace ArduinoShell
 
-#endif  /* __AS_CONFIGBLOCK_H__ */
+#endif  /* __CONFIGBLOCK_H__ */
