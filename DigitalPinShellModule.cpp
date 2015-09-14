@@ -48,17 +48,21 @@ void DigitalPinShellModule::setup()
             pinMode(i, INPUT);
         }
         else
-        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_OUTPUT))       
-        { 
-            pinMode(i, OUTPUT);
-
-            // Apply the saved output value.
-            
-        }
-        else
         if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_INPUT_PULLUP)) 
         { 
             pinMode(i, INPUT_PULLUP);
+        }
+        else
+        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_OUTPUT_HIGH))
+        { 
+            pinMode(i, OUTPUT);
+            digitalWrite(i, HIGH);
+        }
+        else
+        if (configBlock.isPinType(i, ConfigBlock::PinType::DIGITAL_OUTPUT_LOW))
+        {
+            pinMode(i, OUTPUT);
+            digitalWrite(i, LOW);
         }
     }
 }
@@ -79,11 +83,10 @@ void DigitalPinShellModule::run(String rawCommand)
     if (!cp.command.equals("pin")) return;
 
     // Examples: pin 8 in
-    //           pin 8 out
     //           pin 8 in_pullup
-    //           pin 8 disable
     //           pin 8 high
     //           pin 8 low
+    //           pin 8 reset
     if (cp.paramCount == 2)
     {
         // Set up I/O pins, turn them on or off (if set to output)
@@ -107,12 +110,6 @@ void DigitalPinShellModule::run(String rawCommand)
                 pinMode(pin, INPUT);
             }
             else
-            if (cp.params[1].equals("out"))
-            {
-                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
-                pinMode(pin, OUTPUT);
-            }
-            else
             if (cp.params[1].equals("in_pullup"))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_INPUT_PULLUP);
@@ -121,30 +118,30 @@ void DigitalPinShellModule::run(String rawCommand)
             else
             if (cp.params[1].equals("high"))
             {
-                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT_HIGH);
                 pinMode(pin, OUTPUT);
 
-                ConfigBlock::PinValue pinValue = { .digital = HIGH };
-                configBlock.setPinValue(pin, pinValue);
+//                ConfigBlock::PinValue pinValue = { .digital = HIGH };
+//                configBlock.setPinValue(pin, pinValue);
                 digitalWrite(pin, HIGH);
             }
             else
             if  (cp.params[1].equals("low"))
             {
-                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT);
+                configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT_LOW);
                 pinMode(pin, OUTPUT);
 
-                ConfigBlock::PinValue pinValue = { .digital = LOW };
-                configBlock.setPinValue(pin, pinValue);
+//                ConfigBlock::PinValue pinValue = { .digital = LOW };
+//                configBlock.setPinValue(pin, pinValue);
                 digitalWrite(pin, LOW);
+            }
+            else
+            if (cp.params[1].equals("reset"))
+            {
+                configBlock.setPinType(pin, ConfigBlock::PinType::NO_TYPE);
             }
         }
     }
-}
-
-void DigitalPinShellModule::saveDefaults()
-{
-    configBlock.save();
 }
 
 //void DigitalPinShellModule::loadDefaults()

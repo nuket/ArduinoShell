@@ -41,7 +41,7 @@ void ConfigShellModule::run(String rawCommand)
 
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
-    cp.print();
+    // cp.print();
 
     if (!cp.command.equals("config")) return;
 
@@ -67,9 +67,28 @@ void ConfigShellModule::print()
     for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
     {
         memset(output, 0, 80);
+        
         type = configBlock.data.pinConfig[i].type;
         snprintf(output, 80, "Config for Pin %02d: %s", i, type < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[type] : "NOT CONFIGURED");
         serialOut.println(output);
+
+//        switch (configBlock.data.pinConfig[i].type)
+//        {
+//            case ConfigBlock::PinType::DIGITAL_OUTPUT:
+//                memset(output, 0, 80);
+//                snprintf(output, 80, " (%s)", configBlock.data.pinConfig[i].value.digital == HIGH ? "HIGH" : "LOW");
+//                serialOut.println(output);
+//                break;
+////            case PinType::PWM:
+////                break;
+////            case PinType::SERIAL_HARDWARE:
+////                break;
+////            case PinType::SERIAL_SOFTWARE:
+////                break;
+//            default:
+//                serialOut.println();
+//                break;
+//        }
     }
 }
 

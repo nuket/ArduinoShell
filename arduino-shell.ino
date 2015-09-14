@@ -63,14 +63,11 @@ void setup()
 
     Serial.println("Arduino Shell");
     Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
-    Serial.println("");
+    Serial.println();
 
-    
-
-//    configBlock.cat();
-//    digitalPinShell.setup();
+    digitalPinShell.setup();
 //    eepromShell.setup();
-//
+
 //#if ENABLE_UNIT_TESTS
 //    test_command_and_params_class();
 //#endif

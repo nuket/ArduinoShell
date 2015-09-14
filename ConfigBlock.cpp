@@ -52,6 +52,7 @@ ConfigBlock::ConfigBlock(uint32_t configBase) :
 
     if (crc == eepromConfigData.crc)
     {
+        data.crc = crc;
         memcpy(data.pinConfig, eepromConfigData.pinConfig, sizeof(PinConfig) * MAX_PINS);
     }
 }

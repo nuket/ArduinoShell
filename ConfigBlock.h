@@ -45,16 +45,17 @@ public:
     enum PinType
     {
         NO_TYPE              = 0,  //!< Don't bother configuring at setup time.
-        DIGITAL_INPUT        = 1,
-        DIGITAL_INPUT_PULLUP = 2,
-        DIGITAL_OUTPUT       = 3,
-        ANALOG_INPUT         = 4,
-        PWM                  = 5,
-        SERIAL_HARDWARE      = 6,
-        SERIAL_SOFTWARE      = 7,
-        SERIAL_CAN           = 8,
-        SERIAL_I2C           = 9,
-        SERIAL_SPI           = 10,
+        DIGITAL_INPUT,
+        DIGITAL_INPUT_PULLUP,
+        DIGITAL_OUTPUT_HIGH,
+        DIGITAL_OUTPUT_LOW,   
+        ANALOG_INPUT,
+        PWM,
+        SERIAL_HARDWARE,
+        SERIAL_SOFTWARE,
+        SERIAL_CAN,
+        SERIAL_I2C,
+        SERIAL_SPI,
         LAST_ENTRY
     };
 
@@ -62,7 +63,8 @@ public:
         "NO_TYPE",
         "DIGITAL_INPUT",
         "DIGITAL_INPUT_PULLUP",
-        "DIGITAL_OUTPUT",
+        "DIGITAL_OUTPUT_HIGH",
+        "DIGITAL_OUTPUT_LOW",
         "ANALOG_INPUT",
         "PWM",
         "SERIAL_HARDWARE",
@@ -118,8 +120,6 @@ public:
      * Used by the initialization routines for the various pin types.
      */
     bool isPinType(uint8_t pin, PinType pinType);
-
-    uint8_t getDigitalOutputValue(uint8_t pin);
 
 private:
     friend class ConfigShellModule;

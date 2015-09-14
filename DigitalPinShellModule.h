@@ -53,10 +53,9 @@ public:
     const String& help() override;
     void run(String rawCommand) override;
 
-    void saveDefaults();
     // void loadDefaults() override;
 
-    //! Set the EEPROM config block base address and serial output port.
+    //! Dependency-inject the config block and serial output port.
     DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
 
