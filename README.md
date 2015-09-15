@@ -104,7 +104,7 @@ param[1]: >>10<<
 
 Make sure to copy the `platform.local.txt` file to the correct Arduino IDE folder, 
 to enable C++11 compilation support:
-On Linux, that folder is inside the Arduino directory tree at 
+On Linux, that folder is inside the Arduino IDE directory tree at 
 `arduino-1.6.5-r5/hardware/arduino/avr`. On Windows and OS X, it's in a similar subfolder.
 
 # License
