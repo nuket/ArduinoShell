@@ -1,0 +1,2 @@
+compiler.cpp.extra_flags=-std=c++11
+
