@@ -21,7 +21,7 @@ to their last HIGH or LOW voltage level.
 
 ## Command Examples
 
-**`help`**
+### `help`
 
 Prints out the commands that are available the be played with.
 
