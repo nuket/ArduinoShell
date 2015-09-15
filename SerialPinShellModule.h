@@ -21,35 +21,39 @@
     THE SOFTWARE.
 */
 
-#ifndef __CONFIGSHELLMODULE_H__
-#define __CONFIGSHELLMODULE_H__
+/**
+ * \file
+ */
+
+#ifndef __SERIALPINSHELLMODULE_H__
+#define __SERIALPINSHELLMODULE_H__
 
 #include "ShellModule.h"
-
-class Stream;
 
 namespace ArduinoShell
 {
 
 class ConfigBlock;
 
-class ConfigShellModule : public ShellModule
+class SerialPinShellModule : public ShellModule
 {
 private:
+    //! The serial output stream to send status and debugging messages.
+    Stream& serialOut;
+
+    //! Shared Config Block.
     ConfigBlock& configBlock;
-    Stream&      serialOut;
 public:
-    ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut);
+    //! Sets up the serial I/O pins, using stored EEPROM defaults.
+    void setup() override;
 
-    const String& help();
-    void run(String rawCommand);
+    const String& help() override;
+    void run(String rawCommand) override;
 
-    /**
-     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
-     */
-    void print();
+    //! Dependency-inject the config block and serial output port.
+    SerialPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
 
 } // namespace ArduinoShell
 
-#endif // __CONFIGSHELLMODULE_H__
+#endif // __SERIALPINSHELLMODULE_H__

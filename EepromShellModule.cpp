@@ -50,7 +50,11 @@ void EepromShellModule::setup()
 
 const String& EepromShellModule::help()
 {
-    serialOut.println(__func__);
+    serialOut.println("EEPROM Shell commands:\n"
+                      "    p\n"
+                      "    p <address>\n"
+                      "    p <address> <rows>\n"
+                      "    wb <address> <byte-value> -- writes the byte-value to the address");
 }
 
 struct EepromRow

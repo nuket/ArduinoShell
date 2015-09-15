@@ -34,6 +34,13 @@ ConfigShellModule::ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut
 {
 }
 
+const String& ConfigShellModule::help()
+{
+    serialOut.println("Config Shell commands:\n"
+                      "    config print\n"
+                      "    config save\n");
+}
+
 void ConfigShellModule::run(String rawCommand)
 {
     // Parse it.

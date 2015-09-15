@@ -69,6 +69,13 @@ void DigitalPinShellModule::setup()
 
 const String& DigitalPinShellModule::help()
 {
+    serialOut.println("Digital Pin Shell commands:\n"
+                      "    pin <n> in\n"
+                      "    pin <n> in_pullup\n"
+                      "    pin <n> high\n"
+                      "    pin <n> low\n"
+                      "    pin <n> reset\n");
+    
 }
 
 void DigitalPinShellModule::run(String rawCommand)
@@ -140,9 +147,5 @@ void DigitalPinShellModule::run(String rawCommand)
         }
     }
 }
-
-//void DigitalPinShellModule::loadDefaults()
-//{   
-//}
 
 } // namespace ArduinoShell

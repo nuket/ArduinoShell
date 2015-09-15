@@ -21,35 +21,31 @@
     THE SOFTWARE.
 */
 
-#ifndef __CONFIGSHELLMODULE_H__
-#define __CONFIGSHELLMODULE_H__
-
-#include "ShellModule.h"
-
-class Stream;
+#include "SerialPinShellModule.h"
 
 namespace ArduinoShell
 {
 
-class ConfigBlock;
-
-class ConfigShellModule : public ShellModule
+SerialPinShellModule::SerialPinShellModule(ConfigBlock& configBlock, Stream& serialOut) :
+    configBlock(configBlock),
+    serialOut(serialOut)
 {
-private:
-    ConfigBlock& configBlock;
-    Stream&      serialOut;
-public:
-    ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut);
+}
 
-    const String& help();
-    void run(String rawCommand);
+/**
+ * Restore the saved configuration of each of pins.
+ */
+void SerialPinShellModule::setup()
+{
+    
+}
 
-    /**
-     * \brief Print out the contents of the ConfigBlock data in a human-readable form.
-     */
-    void print();
-};
+const String& SerialPinShellModule::help()
+{
+}
 
-} // namespace ArduinoShell
+void SerialPinShellModule::run(String rawCommand)
+{
+}
 
-#endif // __CONFIGSHELLMODULE_H__
+}

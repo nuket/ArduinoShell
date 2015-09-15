@@ -53,8 +53,6 @@ public:
     const String& help() override;
     void run(String rawCommand) override;
 
-    // void loadDefaults() override;
-
     //! Dependency-inject the config block and serial output port.
     DigitalPinShellModule(ConfigBlock& configBlock, Stream& serialOut);
 };
