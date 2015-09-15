@@ -21,6 +21,33 @@ to their last HIGH or LOW voltage level.
 
 ## Command Examples
 
+**`help`**
+
+Prints out the commands that are available the be played with.
+
+```
+Arduino Shell
+(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.
+
+help
+Config Shell commands:
+    config print
+    config save
+
+Digital Pin Shell commands:
+    pin <n> in
+    pin <n> in_pullup
+    pin <n> high
+    pin <n> low
+    pin <n> reset
+
+EEPROM Shell commands:
+    p
+    p <address>
+    p <address> <rows>
+    wb <address> <byte-value> -- writes the byte-value to the address
+```
+
 ### `config print`
 
 Prints the currently running pin configuration, like so:
