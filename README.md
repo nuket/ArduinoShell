@@ -100,6 +100,11 @@ param[1]: >>10<<
 0090 | FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF | ................      
 ```
 
+# Building
+
+Make sure to copy the platform.local.txt to the correct Arduino folder, to enable C++11 compilation support:
+On Linux, that folder is inside the Arduino directory tree at `arduino-1.6.5-r5/hardware/arduino/avr`. On Windows and OS X, it's in a similar subfolder.
+
 # License
 
 ```
