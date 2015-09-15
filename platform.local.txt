@@ -1,2 +1,2 @@
+# Copy this to arduino-1.6.5-r5/hardware/arduino/avr to enable C++11 support.
 compiler.cpp.extra_flags=-std=c++11
-
