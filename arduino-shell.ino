@@ -48,11 +48,13 @@ using ArduinoShell::SerialPinShellModule;
 // Globals
 // -----------------------------------------------------------------------
 
+HardwareSerial&         serialPort(Serial);
+
 ConfigBlock             configBlock(0x0000);
-ConfigShellModule       configShell(configBlock, Serial);
-DigitalPinShellModule   digitalPinShell(configBlock, Serial);
-EepromShellModule       eepromShell(Serial);
-SerialPinShellModule    serialPinShell(configBlock, Serial);
+ConfigShellModule       configShell(configBlock, serialPort);
+DigitalPinShellModule   digitalPinShell(configBlock, serialPort);
+EepromShellModule       eepromShell(serialPort);
+SerialPinShellModule    serialPinShell(configBlock, serialPort);
 
 // -----------------------------------------------------------------------
 // main()
@@ -68,11 +70,11 @@ static void help()
 
 void setup() 
 {
-    Serial.begin(115200);
+    serialPort.begin(115200);
 
-    Serial.println("Arduino Shell");
-    Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
-    Serial.println();
+    serialPort.println("Arduino Shell");
+    serialPort.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
+    serialPort.println();
 
     digitalPinShell.setup();
 //    eepromShell.setup();
@@ -85,12 +87,47 @@ void loop()
 {
     const char TERMINATOR = '\n';
     
-    // Read and process commands.
-    if (millis() % 1000 == 0 && Serial.available())
+    static char    commandBuffer[80] = {0};
+    static uint8_t index = 0;
+    static bool    newlineFound = false;
+
+    // Read and echo bytes.
+    if (serialPort.available() > 0)
     {
-        String command = Serial.readStringUntil(TERMINATOR);
+        // Append the bytes to the end of commandBuffer.
+        commandBuffer[index] = serialPort.read();
+
+        switch (commandBuffer[index])
+        {
+            case 0x08:
+                // Also: http://www.ibb.net/~anne/keyboard.html
+                //
+                // If a backspace is pressed, you have to send 
+                // a DEL byte as well, to clear the character.
+                serialPort.write(commandBuffer[index]);
+                serialPort.print("\033\1331\120");
+                break;
+            case '\r':
+            case '\n':
+                // If a CR / LF was detected in the incoming bytes,
+                // then move on to command processing.
+                serialPort.print("\r\n");
+                newlineFound = true;
+                break;
+            default:
+                // Echo the bytes.
+                serialPort.write(commandBuffer[index]);
+                break;
+        }
+
+        index++;
+    }
+
+    // Read and process commands.
+    if (millis() % 250 == 0 && newlineFound)
+    {
+        String command(commandBuffer);
         command.trim();
-        Serial.println(command);
 
         if (command.equals("help"))
         {
@@ -103,5 +140,10 @@ void loop()
             eepromShell.run(command);
             serialPinShell.run(command);
         }
+
+        // Reset command input buffer, and indexing.
+        memset(commandBuffer, 0, sizeof(commandBuffer));
+        index = 0;
+        newlineFound = false;
     }
 }
