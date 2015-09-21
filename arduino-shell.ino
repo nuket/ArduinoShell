@@ -48,11 +48,13 @@ using ArduinoShell::SerialPinShellModule;
 // Globals
 // -----------------------------------------------------------------------
 
+HardwareSerial&         serialPort(Serial);
+
 ConfigBlock             configBlock(0x0000);
-ConfigShellModule       configShell(configBlock, Serial);
-DigitalPinShellModule   digitalPinShell(configBlock, Serial);
-EepromShellModule       eepromShell(Serial);
-SerialPinShellModule    serialPinShell(configBlock, Serial);
+ConfigShellModule       configShell(configBlock, serialPort);
+DigitalPinShellModule   digitalPinShell(configBlock, serialPort);
+EepromShellModule       eepromShell(serialPort);
+SerialPinShellModule    serialPinShell(configBlock, serialPort);
 
 // -----------------------------------------------------------------------
 // main()
@@ -68,11 +70,12 @@ static void help()
 
 void setup() 
 {
-    Serial.begin(115200);
+    // Single hardware-specific serial port call.
+    serialPort.begin(115200);
 
-    Serial.println("Arduino Shell");
-    Serial.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
-    Serial.println();
+    serialPort.println("Arduino Shell");
+    serialPort.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
+    serialPort.println();
 
     digitalPinShell.setup();
 //    eepromShell.setup();
@@ -84,13 +87,15 @@ void setup()
 void loop() 
 {
     const char TERMINATOR = '\n';
+
+    // if (
     
     // Read and process commands.
-    if (millis() % 1000 == 0 && Serial.available())
+    if (millis() % 1000 == 0 && serialPort.available())
     {
-        String command = Serial.readStringUntil(TERMINATOR);
+        String command = serialPort.readStringUntil(TERMINATOR);
         command.trim();
-        Serial.println(command);
+        serialPort.println(command);
 
         if (command.equals("help"))
         {
