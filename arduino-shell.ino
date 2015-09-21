@@ -86,7 +86,7 @@ void setup()
 void loop() 
 {
     const char TERMINATOR = '\n';
-    
+  
     static char    commandBuffer[80] = {0};
     static uint8_t index = 0;
     static bool    newlineFound = false;
