@@ -70,7 +70,6 @@ static void help()
 
 void setup() 
 {
-    // Single hardware-specific serial port call.
     serialPort.begin(115200);
 
     serialPort.println("Arduino Shell");
@@ -87,15 +86,48 @@ void setup()
 void loop() 
 {
     const char TERMINATOR = '\n';
+  
+    static char    commandBuffer[80] = {0};
+    static uint8_t index = 0;
+    static bool    newlineFound = false;
 
-    // if (
-    
-    // Read and process commands.
-    if (millis() % 1000 == 0 && serialPort.available())
+    // Read and echo bytes.
+    if (serialPort.available() > 0)
     {
-        String command = serialPort.readStringUntil(TERMINATOR);
+        // Append the bytes to the end of commandBuffer.
+        commandBuffer[index] = serialPort.read();
+
+        switch (commandBuffer[index])
+        {
+            case 0x08:
+                // Also: http://www.ibb.net/~anne/keyboard.html
+                //
+                // If a backspace is pressed, you have to send 
+                // a DEL byte as well, to clear the character.
+                serialPort.write(commandBuffer[index]);
+                serialPort.print("\033\1331\120");
+                break;
+            case '\r':
+            case '\n':
+                // If a CR / LF was detected in the incoming bytes,
+                // then move on to command processing.
+                serialPort.print("\r\n");
+                newlineFound = true;
+                break;
+            default:
+                // Echo the bytes.
+                serialPort.write(commandBuffer[index]);
+                break;
+        }
+
+        index++;
+    }
+
+    // Read and process commands.
+    if (millis() % 250 == 0 && newlineFound)
+    {
+        String command(commandBuffer);
         command.trim();
-        serialPort.println(command);
 
         if (command.equals("help"))
         {
@@ -108,5 +140,10 @@ void loop()
             eepromShell.run(command);
             serialPinShell.run(command);
         }
+
+        // Reset command input buffer, and indexing.
+        memset(commandBuffer, 0, sizeof(commandBuffer));
+        index = 0;
+        newlineFound = false;
     }
 }
