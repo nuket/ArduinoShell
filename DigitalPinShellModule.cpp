@@ -69,12 +69,12 @@ void DigitalPinShellModule::setup()
 
 const String& DigitalPinShellModule::help()
 {
-    serialOut.println("Digital Pin Shell commands:\n"
-                      "    pin <n> in\n"
-                      "    pin <n> in_pullup\n"
-                      "    pin <n> high\n"
-                      "    pin <n> low\n"
-                      "    pin <n> reset\n");
+    serialOut.println("Digital Pin Shell commands:\r\n"
+                      "    pin <n> in\r\n"
+                      "    pin <n> in_pullup\r\n"
+                      "    pin <n> high\r\n"
+                      "    pin <n> low\r\n"
+                      "    pin <n> reset\r\n");
     
 }
 

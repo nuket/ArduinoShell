@@ -58,6 +58,14 @@ SerialPinShellModule    serialPinShell(configBlock, Serial);
 // main()
 // -----------------------------------------------------------------------
 
+static void help()
+{
+    configShell.help();
+    digitalPinShell.help();
+    eepromShell.help();
+    serialPinShell.help();
+}
+
 void setup() 
 {
     Serial.begin(115200);
@@ -69,6 +77,8 @@ void setup()
     digitalPinShell.setup();
 //    eepromShell.setup();
     serialPinShell.setup();
+
+    help();
 }
 
 void loop() 
@@ -79,14 +89,12 @@ void loop()
     if (millis() % 1000 == 0 && Serial.available())
     {
         String command = Serial.readStringUntil(TERMINATOR);
+        command.trim();
         Serial.println(command);
 
         if (command.equals("help"))
         {
-            configShell.help();
-            digitalPinShell.help();
-            eepromShell.help();
-            serialPinShell.help();
+            help();
         }
         else
         {
