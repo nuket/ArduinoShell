@@ -63,17 +63,26 @@ void ConfigShellModule::run(String rawCommand)
 void ConfigShellModule::print()
 {
     char output[80] = {0};
-    uint8_t type = 0;
+    
+    uint8_t typeL = 0;
+    uint8_t typeR = 0;
+    
+    uint8_t maxPins = ConfigBlock::MAX_PINS >> 1;
 
-    snprintf(output, 80, "ConfigBlock CRC: %08x", configBlock.data.crc);
+    snprintf(output, 80, "ConfigBlock CRC: %08x\r\n", configBlock.data.crc);
     serialOut.println(output);
     
-    for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
+    for (int i = 0; i < maxPins; i++)
     {
         memset(output, 0, 80);
         
-        type = configBlock.data.pinConfig[i].type;
-        snprintf(output, 80, "Config for Pin %02d: %s", i, type < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[type] : "NOT CONFIGURED");
+        typeL = configBlock.data.pinConfig[2 * i].type;
+        typeR = configBlock.data.pinConfig[2 * i + 1].type;
+        
+        snprintf(output, 80, "Pin %02d: %20s    |    Pin %02d: %20s", 
+            2 * i,     typeL < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[typeL] : "NOT CONFIGURED",
+            2 * i + 1, typeR < ConfigBlock::PinType::LAST_ENTRY ? ConfigBlock::PinTypeStrings[typeR] : "NOT CONFIGURED");
+
         serialOut.println(output);
 
 //        switch (configBlock.data.pinConfig[i].type)
@@ -94,6 +103,8 @@ void ConfigShellModule::print()
 //                break;
 //        }
     }
+
+    serialOut.println();
 }
 
 } // namespace ArduinoShell

@@ -91,21 +91,29 @@ void loop()
     static uint8_t index = 0;
     static bool    newlineFound = false;
 
+    char input;
+
     // Read and echo bytes.
     if (serialPort.available() > 0)
     {
-        // Append the bytes to the end of commandBuffer.
-        commandBuffer[index] = serialPort.read();
+        input = serialPort.read();
 
-        switch (commandBuffer[index])
+        switch (input)
         {
             case 0x08:
                 // Also: http://www.ibb.net/~anne/keyboard.html
                 //
                 // If a backspace is pressed, you have to send 
-                // a DEL byte as well, to clear the character.
-                serialPort.write(commandBuffer[index]);
-                serialPort.print("\033\1331\120");
+                // a VT100 erase character sequence as well, to clear the character.
+                if (index > 0)
+                {
+                    serialPort.write(input);           // backspace
+                    serialPort.print("\033\1331\120"); // erase this character
+                    
+                    index--;
+                }
+                
+                commandBuffer[index] = 0;
                 break;
             case '\r':
             case '\n':
@@ -115,12 +123,18 @@ void loop()
                 newlineFound = true;
                 break;
             default:
-                // Echo the bytes.
-                serialPort.write(commandBuffer[index]);
+                if (0x20 <= input && input <= 0x7e &&
+                    index < sizeof(commandBuffer) - 1) // Limit text entry to 79 characters.
+                {
+                    // Echo the bytes.
+                    serialPort.write(input);
+                    
+                    commandBuffer[index] = input;
+                    index++;
+                }
                 break;
         }
 
-        index++;
     }
 
     // Read and process commands.
