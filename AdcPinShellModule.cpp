@@ -46,11 +46,18 @@ void AdcPinShellModule::run(String rawCommand)
     CommandAndParams cp(rawCommand, serialOut);
 
     if (!cp.command.equals("adc")) return;
+    if (cp.paramCount != 2) return;
 
     if (cp.params[0].equals("read"))
     {
         serialOut.println("Reading ADC pin value.");
-        // Read the ADC pin value.
+
+        long int pin = strtol(cp.params[0].c_str(), NULL, 0);
+        // serialOut.println(pin);
+
+        if (!(0 <= pin && pin <= 64)) return; // ConfigBlock::MAX_ANALOG_PINS)
+
+        serialOut.println(analogRead(pin));
     }
 
 }

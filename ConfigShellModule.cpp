@@ -52,6 +52,7 @@ void ConfigShellModule::run(String rawCommand)
     if (cp.params[0].equals("save"))
     {
         configBlock.save();
+        serialOut.println("Config saved.\r\n");
     }
     else
     if (cp.params[0].equals("print"))
