@@ -22,8 +22,9 @@
 */
 
 #include "ConfigBlock.h"
+
+#include "AdcPinShellModule.h"
 #include "ConfigShellModule.h"
-#include "Crc.h"
 #include "DigitalPinShellModule.h"
 #include "EepromShellModule.h"
 #include "SerialPinShellModule.h"
@@ -39,6 +40,8 @@
 // -----------------------------------------------------------------------
 
 using ArduinoShell::ConfigBlock;
+
+using ArduinoShell::AdcPinShellModule;
 using ArduinoShell::ConfigShellModule;
 using ArduinoShell::DigitalPinShellModule;
 using ArduinoShell::EepromShellModule;
@@ -51,6 +54,8 @@ using ArduinoShell::SerialPinShellModule;
 HardwareSerial&         serialPort(Serial);
 
 ConfigBlock             configBlock(0x0000);
+
+AdcPinShellModule       adcPinShell(configBlock, serialPort);
 ConfigShellModule       configShell(configBlock, serialPort);
 DigitalPinShellModule   digitalPinShell(configBlock, serialPort);
 EepromShellModule       eepromShell(serialPort);
@@ -62,6 +67,7 @@ SerialPinShellModule    serialPinShell(configBlock, serialPort);
 
 static void help()
 {
+    adcPinShell.help();
     configShell.help();
     digitalPinShell.help();
     eepromShell.help();
@@ -73,7 +79,7 @@ void setup()
     serialPort.begin(115200);
 
     serialPort.println("Arduino Shell");
-    serialPort.println("(c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
+    serialPort.println("Copyright (c) 2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
     serialPort.println();
 
     digitalPinShell.setup();
@@ -149,6 +155,7 @@ void loop()
         }
         else
         {
+            adcPinShell.run(command);
             configShell.run(command);
             digitalPinShell.run(command);
             eepromShell.run(command);
