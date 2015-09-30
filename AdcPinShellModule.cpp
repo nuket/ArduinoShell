@@ -37,6 +37,7 @@ AdcPinShellModule::AdcPinShellModule(ConfigBlock& configBlock, Stream& serialOut
 const String& AdcPinShellModule::help()
 {
     serialOut.println("ADC Pin Shell commands:\r\n"
+                      "    adc aref <reference>\r\n"
                       "    adc read <n>\r\n");
 }
 
@@ -48,18 +49,46 @@ void AdcPinShellModule::run(String rawCommand)
     if (!cp.command.equals("adc")) return;
     if (cp.paramCount != 2) return;
 
+    if (cp.params[0].equals("aref"))
+    {
+        serialOut.println("Setting A/D converter voltage reference source.");
+        if (cp.params[1].equals("default"))
+        {
+            analogReference(DEFAULT);
+        }
+        else
+        if (cp.params[1].equals("internal"))
+        {
+            // analogReference(INTERNAL);
+        }
+        else
+        if (cp.params[1].equals("1.1v"))
+        {
+            analogReference(INTERNAL1V1);
+        }
+        else
+        if (cp.params[1].equals("2.56v"))
+        {
+            analogReference(INTERNAL2V56);
+        }
+        else
+        if (cp.params[1].equals("external"))
+        {
+            analogReference(EXTERNAL);
+        }
+    }
+    else
     if (cp.params[0].equals("read"))
     {
         serialOut.println("Reading ADC pin value.");
 
-        long int pin = strtol(cp.params[0].c_str(), NULL, 0);
+        long int pin = strtol(cp.params[1].c_str(), NULL, 0);
         // serialOut.println(pin);
 
         if (!(0 <= pin && pin <= 64)) return; // ConfigBlock::MAX_ANALOG_PINS)
 
         serialOut.println(analogRead(pin));
     }
-
 }
 
 } // namespace ArduinoShell
