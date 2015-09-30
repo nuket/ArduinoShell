@@ -30,6 +30,9 @@ Arduino Shell
 (c)2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.
 
 help
+ADC Pin Shell commands:
+    adc read <n>
+
 Config Shell commands:
     config print
     config save
@@ -48,6 +51,14 @@ EEPROM Shell commands:
     p <address> <rows>
     wb <address> <byte-value> -- writes the byte-value to the address
 ```
+
+### `adc read <n>`
+
+Read analog pin <n> and print the current voltage value.
+
+### `adc aref <reference>`
+
+Set the ADC analog reference voltage source.
 
 ### `config print`
 
