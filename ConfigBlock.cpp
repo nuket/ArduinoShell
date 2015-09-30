@@ -92,6 +92,14 @@ bool ConfigBlock::isPinType(uint8_t pin, PinType pinType)
     return (data.pinConfig[pin].type == pinType);
 }
 
+ConfigBlock::PinType ConfigBlock::getPinType(uint8_t pin)
+{
+    if (pin >= MAX_PINS)                                 return PinType::NO_TYPE;
+    if (data.pinConfig[pin].type >= PinType::LAST_ENTRY) return PinType::NO_TYPE;
+
+    return data.pinConfig[pin].type;
+}
+
 constexpr const char * ConfigBlock::PinTypeStrings[PinType::LAST_ENTRY];
 
 } // namespace ArduinoShell

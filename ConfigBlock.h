@@ -114,6 +114,8 @@ public:
     void setPinType (uint8_t pin, PinType pinType);
     void setPinValue(uint8_t pin, const PinValue& value);
 
+    PinType getPinType(uint8_t pin);
+
     /**
      * \brief Allow caller to check whether pin is of a particular type.
      * 

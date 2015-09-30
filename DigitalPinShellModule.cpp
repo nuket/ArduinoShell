@@ -74,6 +74,7 @@ const String& DigitalPinShellModule::help()
                       "    pin <n> in_pullup\r\n"
                       "    pin <n> high\r\n"
                       "    pin <n> low\r\n"
+                      "    pin <n> status\r\n"
                       "    pin <n> reset\r\n");
     
 }
@@ -138,6 +139,12 @@ void DigitalPinShellModule::run(String rawCommand)
 //                ConfigBlock::PinValue pinValue = { .digital = LOW };
 //                configBlock.setPinValue(pin, pinValue);
                 digitalWrite(pin, LOW);
+            }
+            else
+            if (cp.params[1].equals("status"))
+            {
+                ConfigBlock::PinType type = configBlock.getPinType(pin);
+                serialOut.println(ConfigBlock::PinTypeStrings[type]);
             }
             else
             if (cp.params[1].equals("reset"))
