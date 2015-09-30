@@ -39,6 +39,7 @@ Digital Pin Shell commands:
     pin <n> in_pullup
     pin <n> high
     pin <n> low
+    pin <n> status
     pin <n> reset
 
 EEPROM Shell commands:
@@ -89,6 +90,25 @@ Sets the pin to `OUTPUT` mode and sets the voltage level to `HIGH`.
 
 Sets the pin to `OUTPUT` mode and sets the voltage level to `LOW`.
 
+### `pin <n> status`
+
+Prints the current setting of the pin. Useful for scripting. One of:
+
+```
+"NO_TYPE",
+"DIGITAL_INPUT",
+"DIGITAL_INPUT_PULLUP",
+"DIGITAL_OUTPUT_HIGH",
+"DIGITAL_OUTPUT_LOW",
+"ANALOG_INPUT",
+"PWM",
+"SERIAL_HARDWARE",
+"SERIAL_SOFTWARE",
+"SERIAL_CAN",
+"SERIAL_I2C",
+"SERIAL_SPI"
+```
+
 ### `pin <n> reset`
 
 Resets the pin to `NO_TYPE` mode, which means that when the Arduino
@@ -130,9 +150,11 @@ param[1]: >>10<<
 # Building
 
 Make sure to copy the `platform.local.txt` file to the correct Arduino IDE folder, 
-to enable C++11 compilation support:
-On Linux, that folder is inside the Arduino IDE directory tree at 
-`arduino-1.6.5-r5/hardware/arduino/avr`. On Windows and OS X, it's in a similar subfolder.
+to enable C++11 compilation support. It basically adds the `-std=c++11` option to 
+the AVR gcc compiler command line:
+
+* On Linux, that folder is inside the Arduino IDE directory tree at `arduino-1.6.5-r5/hardware/arduino/avr`. 
+* On Windows and OS X, it's in a similar subfolder.
 
 # License
 
