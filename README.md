@@ -95,18 +95,18 @@ Sets the pin to `OUTPUT` mode and sets the voltage level to `LOW`.
 Prints the current setting of the pin. Useful for scripting. One of:
 
 ```
-    "NO_TYPE",
-    "DIGITAL_INPUT",
-    "DIGITAL_INPUT_PULLUP",
-    "DIGITAL_OUTPUT_HIGH",
-    "DIGITAL_OUTPUT_LOW",
-    "ANALOG_INPUT",
-    "PWM",
-    "SERIAL_HARDWARE",
-    "SERIAL_SOFTWARE",
-    "SERIAL_CAN",
-    "SERIAL_I2C",
-    "SERIAL_SPI"
+"NO_TYPE",
+"DIGITAL_INPUT",
+"DIGITAL_INPUT_PULLUP",
+"DIGITAL_OUTPUT_HIGH",
+"DIGITAL_OUTPUT_LOW",
+"ANALOG_INPUT",
+"PWM",
+"SERIAL_HARDWARE",
+"SERIAL_SOFTWARE",
+"SERIAL_CAN",
+"SERIAL_I2C",
+"SERIAL_SPI"
 ```
 
 ### `pin <n> reset`
