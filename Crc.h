@@ -22,10 +22,10 @@
 */
 
 /**
- * \file
- * \brief Functions and types for CRC checks.
+ * \file Crc.h
+ * Functions and types for CRC checks.
  *
- * Generated on Tue Sep  1 23:48:57 2015,
+ * Generated on Wed Oct 28 00:22:37 2015,
  * by pycrc v0.8.3, https://pycrc.org
  * using the configuration:
  *    Width        = 16
@@ -34,12 +34,15 @@
  *    ReflectIn    = True
  *    XorOut       = 0x0000
  *    ReflectOut   = True
- *    Algorithm    = table-driven
+ *    Algorithm    = bit-by-bit-fast
+ *
+ * python pycrc.py --model=crc-16 --algorithm=bit-by-bit-fast --generate=h -o Crc.h
  *****************************************************************************/
 #ifndef __CRC_H__
 #define __CRC_H__
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +55,7 @@ extern "C" {
  * This is not used anywhere in the generated code, but it may be used by the
  * application code to call algoritm-specific code, is desired.
  *****************************************************************************/
-#define CRC_ALGO_TABLE_DRIVEN 1
+#define CRC_ALGO_BIT_BY_BIT_FAST 1
 
 
 /**
@@ -60,7 +63,7 @@ extern "C" {
  *
  * This type must be big enough to contain at least 16 bits.
  *****************************************************************************/
-typedef unsigned int crc_t;
+typedef uint_fast16_t crc_t;
 
 
 /**
@@ -78,7 +81,10 @@ crc_t crc_reflect(crc_t data, size_t data_len);
  *
  * \return     The initial crc value.
  *****************************************************************************/
-#define crc_init()      (0x0000)
+static inline crc_t crc_init(void)
+{
+    return 0x0000;
+}
 
 
 /**
@@ -98,7 +104,10 @@ crc_t crc_update(crc_t crc, const void *data, size_t data_len);
  * \param crc  The current crc value.
  * \return     The final crc value.
  *****************************************************************************/
-#define crc_finalize(crc)      (crc ^ 0x0000)
+static inline crc_t crc_finalize(crc_t crc)
+{
+    return crc_reflect(crc, 16) ^ 0x0000;
+}
 
 
 #ifdef __cplusplus
@@ -106,4 +115,3 @@ crc_t crc_update(crc_t crc, const void *data, size_t data_len);
 #endif
 
 #endif      /* __CRC_H__ */
-
