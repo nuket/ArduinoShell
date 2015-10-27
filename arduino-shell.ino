@@ -78,9 +78,8 @@ void setup()
 {
     serialPort.begin(115200);
 
-    serialPort.println("Arduino Shell");
-    serialPort.println("Copyright (c) 2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.");
-    serialPort.println();
+    serialPort.println(F("Arduino Shell"));
+    serialPort.println(F("Copyright (c) 2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.\n"));
 
     digitalPinShell.setup();
 //    eepromShell.setup();
@@ -114,7 +113,7 @@ void loop()
                 if (index > 0)
                 {
                     serialPort.write(input);           // backspace
-                    serialPort.print("\033\1331\120"); // erase this character
+                    serialPort.print(F("\033\1331\120")); // erase this character
                     
                     index--;
                 }
@@ -149,7 +148,7 @@ void loop()
         String command(commandBuffer);
         command.trim();
 
-        if (command.equals("help"))
+        if (command.equals(F("help")))
         {
             help();
         }

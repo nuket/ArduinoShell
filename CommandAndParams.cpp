@@ -80,24 +80,24 @@ CommandAndParams::CommandAndParams(String rawCommand, Stream& serialOut) :
 
 void CommandAndParams::print()
 {
-    serialOut.print("command:  >>");
+    serialOut.print(F("command:  >>"));
     serialOut.print(command);
-    serialOut.println("<<");
+    serialOut.println(F("<<"));
     
     for (int i = 0; i < paramCount; i++)
     {
-        serialOut.print("param[");
+        serialOut.print(F("param["));
         serialOut.print(i);
-        serialOut.print("]: >>");
+        serialOut.print(F("]: >>"));
         serialOut.print(params[i]);
-        serialOut.println("<<");
+        serialOut.println(F("<<"));
     }
 }
 
 #if ENABLE_UNIT_TESTS
 static void test_command_and_params_class()
 {
-    serialOut.println("CommandAndParams unit test starting.");
+    serialOut.println(F("CommandAndParams unit test starting."));
     
     CommandAndParams testA("test 1 2 3");
     testA.print();

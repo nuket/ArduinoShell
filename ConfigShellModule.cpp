@@ -36,9 +36,9 @@ ConfigShellModule::ConfigShellModule(ConfigBlock& configBlock, Stream& serialOut
 
 const String& ConfigShellModule::help()
 {
-    serialOut.println("Config Shell commands:\r\n"
-                      "    config print\r\n"
-                      "    config save\r\n");
+    serialOut.println(F("Config Shell commands:\r\n"
+                        "    config print\r\n"
+                        "    config save\r\n"));
 }
 
 void ConfigShellModule::run(String rawCommand)
@@ -47,15 +47,15 @@ void ConfigShellModule::run(String rawCommand)
     CommandAndParams cp(rawCommand, serialOut);
     // cp.print();
 
-    if (!cp.command.equals("config")) return;
+    if (!cp.command.equals(F("config"))) return;
 
-    if (cp.params[0].equals("save"))
+    if (cp.params[0].equals(F("save")))
     {
         configBlock.save();
-        serialOut.println("Config saved.\r\n");
+        serialOut.println(F("Config saved.\r\n"));
     }
     else
-    if (cp.params[0].equals("print"))
+    if (cp.params[0].equals(F("print")))
     {
         print();
     }

@@ -36,9 +36,9 @@ AdcPinShellModule::AdcPinShellModule(ConfigBlock& configBlock, Stream& serialOut
 
 const String& AdcPinShellModule::help()
 {
-    serialOut.println("ADC Pin Shell commands:\r\n"
-                      "    adc aref <reference>\r\n"
-                      "    adc read <n>\r\n");
+    serialOut.println(F("ADC Pin Shell commands:\r\n"
+                        "    adc aref <reference>\r\n"
+                        "    adc read <n>\r\n"));
 }
 
 void AdcPinShellModule::run(String rawCommand)
@@ -46,18 +46,18 @@ void AdcPinShellModule::run(String rawCommand)
     // Parse it.
     CommandAndParams cp(rawCommand, serialOut);
 
-    if (!cp.command.equals("adc")) return;
+    if (!cp.command.equals(F("adc"))) return;
     if (cp.paramCount != 2) return;
 
-    if (cp.params[0].equals("aref"))
+    if (cp.params[0].equals(F("aref")))
     {
-        serialOut.println("Setting A/D converter voltage reference source.");
-        if (cp.params[1].equals("default"))
+        serialOut.println(F("Setting A/D converter voltage reference source."));
+        if (cp.params[1].equals(F("default")))
         {
             analogReference(DEFAULT);
         }
         else
-        if (cp.params[1].equals("internal"))
+        if (cp.params[1].equals(F("internal")))
         {
             // analogReference(INTERNAL);
         }
@@ -74,15 +74,15 @@ void AdcPinShellModule::run(String rawCommand)
         }
         */
         else
-        if (cp.params[1].equals("external"))
+        if (cp.params[1].equals(F("external")))
         {
             analogReference(EXTERNAL);
         }
     }
     else
-    if (cp.params[0].equals("read"))
+    if (cp.params[0].equals(F("read")))
     {
-        serialOut.println("Reading ADC pin value.");
+        serialOut.println(F("Reading ADC pin value."));
 
         long int pin = strtol(cp.params[1].c_str(), NULL, 0);
         // serialOut.println(pin);

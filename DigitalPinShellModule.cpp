@@ -69,13 +69,13 @@ void DigitalPinShellModule::setup()
 
 const String& DigitalPinShellModule::help()
 {
-    serialOut.println("Digital Pin Shell commands:\r\n"
-                      "    pin <n> in\r\n"
-                      "    pin <n> in_pullup\r\n"
-                      "    pin <n> high\r\n"
-                      "    pin <n> low\r\n"
-                      "    pin <n> status\r\n"
-                      "    pin <n> reset\r\n");
+    serialOut.println(F("Digital Pin Shell commands:\r\n"
+                        "    pin <n> in\r\n"
+                        "    pin <n> in_pullup\r\n"
+                        "    pin <n> high\r\n"
+                        "    pin <n> low\r\n"
+                        "    pin <n> status\r\n"
+                        "    pin <n> reset\r\n"));
     
 }
 
@@ -85,7 +85,7 @@ void DigitalPinShellModule::run(String rawCommand)
     CommandAndParams cp(rawCommand, serialOut);
     // cp.print();
 
-    if (!cp.command.equals("pin")) return;
+    if (!cp.command.equals(F("pin"))) return;
 
     // Examples: pin 8 in
     //           pin 8 in_pullup
@@ -95,9 +95,9 @@ void DigitalPinShellModule::run(String rawCommand)
     if (cp.paramCount == 2)
     {
         // Set up I/O pins, turn them on or off (if set to output)
-        if (cp.params[0].equals("all"))
+        if (cp.params[0].equals(F("all")))
         {
-            if (cp.params[1].equals("out"))
+            if (cp.params[1].equals(F("out")))
             {
                 for (int i = 0; i < ConfigBlock::MAX_PINS; i++)
                 {
@@ -109,19 +109,19 @@ void DigitalPinShellModule::run(String rawCommand)
             long int pin = strtol(cp.params[0].c_str(), NULL, 0);
             // serialOut.println(pin);
 
-            if (cp.params[1].equals("in"))
+            if (cp.params[1].equals(F("in")))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_INPUT);
                 pinMode(pin, INPUT);
             }
             else
-            if (cp.params[1].equals("in_pullup"))
+            if (cp.params[1].equals(F("in_pullup")))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_INPUT_PULLUP);
                 pinMode(pin, INPUT_PULLUP);
             }
             else
-            if (cp.params[1].equals("high"))
+            if (cp.params[1].equals(F("high")))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT_HIGH);
                 pinMode(pin, OUTPUT);
@@ -131,7 +131,7 @@ void DigitalPinShellModule::run(String rawCommand)
                 digitalWrite(pin, HIGH);
             }
             else
-            if  (cp.params[1].equals("low"))
+            if  (cp.params[1].equals(F("low")))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::DIGITAL_OUTPUT_LOW);
                 pinMode(pin, OUTPUT);
@@ -141,13 +141,13 @@ void DigitalPinShellModule::run(String rawCommand)
                 digitalWrite(pin, LOW);
             }
             else
-            if (cp.params[1].equals("status"))
+            if (cp.params[1].equals(F("status")))
             {
                 ConfigBlock::PinType type = configBlock.getPinType(pin);
                 serialOut.println(ConfigBlock::PinTypeStrings[type]);
             }
             else
-            if (cp.params[1].equals("reset"))
+            if (cp.params[1].equals(F("reset")))
             {
                 configBlock.setPinType(pin, ConfigBlock::PinType::NO_TYPE);
             }

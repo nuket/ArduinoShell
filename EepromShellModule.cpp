@@ -43,18 +43,18 @@ EepromShellModule::EepromShellModule(Stream& serialOut) :
 
 void EepromShellModule::setup()
 {
-    serialOut.print("Size of EEPROM: ");
+    serialOut.print(F("Size of EEPROM: "));
     serialOut.print(EEPROM.length());
-    serialOut.println(" bytes.");
+    serialOut.println(F(" bytes."));
 }
 
 const String& EepromShellModule::help()
 {
-    serialOut.println("EEPROM Shell commands:\r\n"
-                      "    p\r\n"
-                      "    p <address>\r\n"
-                      "    p <address> <rows>\r\n"
-                      "    wb <address> <byte-value> -- writes the byte-value to the address\r\n");
+    serialOut.println(F("EEPROM Shell commands:\r\n"
+                        "    p\r\n"
+                        "    p <address>\r\n"
+                        "    p <address> <rows>\r\n"
+                        "    wb <address> <byte-value> -- writes the byte-value to the address\r\n"));
 }
 
 struct EepromRow
@@ -206,7 +206,7 @@ void EepromShellModule::run(String rawCommand)
         printContents(address & 0xFFF0, EEPROM_ROW_LENGTH);
     }
     else
-    if (cp.command.equals("clear-eeprom") == 0)
+    if (cp.command.equals(F("clear-eeprom")) == 0)
     {
     }
 }
