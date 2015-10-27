@@ -61,6 +61,7 @@ void AdcPinShellModule::run(String rawCommand)
         {
             // analogReference(INTERNAL);
         }
+        /*
         else
         if (cp.params[1].equals("1.1v"))
         {
@@ -71,6 +72,7 @@ void AdcPinShellModule::run(String rawCommand)
         {
             analogReference(INTERNAL2V56);
         }
+        */
         else
         if (cp.params[1].equals("external"))
         {
