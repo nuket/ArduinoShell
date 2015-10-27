@@ -36,6 +36,12 @@
 #include <EEPROM.h>
 
 // -----------------------------------------------------------------------
+// Flash-free defines.
+// -----------------------------------------------------------------------
+
+#define MAX_COMMAND_LENGTH 20
+
+// -----------------------------------------------------------------------
 // Imports
 // -----------------------------------------------------------------------
 
@@ -92,7 +98,7 @@ void loop()
 {
     const char TERMINATOR = '\n';
   
-    static char    commandBuffer[80] = {0};
+    static char    commandBuffer[MAX_COMMAND_LENGTH] = {0};
     static uint8_t index = 0;
     static bool    newlineFound = false;
 
@@ -129,7 +135,7 @@ void loop()
                 break;
             default:
                 if (0x20 <= input && input <= 0x7e &&
-                    index < sizeof(commandBuffer) - 1) // Limit text entry to 79 characters.
+                    index < sizeof(commandBuffer) - 1) // Limit text entry to (MAX_COMMAND_LENGTH - 1) characters.
                 {
                     // Echo the bytes.
                     serialPort.write(input);
