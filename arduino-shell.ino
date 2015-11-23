@@ -71,7 +71,7 @@ SerialPinShellModule    serialPinShell(configBlock, serialPort);
 // main()
 // -----------------------------------------------------------------------
 
-static void help()
+void help()
 {
     adcPinShell.help();
     configShell.help();
