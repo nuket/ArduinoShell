@@ -190,68 +190,11 @@ void setup()
 
 void loop() 
 {
-//    const char TERMINATOR = '\n';
-//  
-//    static char    commandBuffer[MAX_COMMAND_LENGTH] = {0};
-//    static uint8_t index = 0;
-//    static bool    newlineFound = false;
-//
-//    char input;
-
-//    String testInput;
-//    testInput.reserve(MAX_COMMAND_LENGTH);
-
-//    // Read and echo bytes.
-//    if (serialPort.available() > 0)
-//    {
-//        input = serialPort.read();
-//
-//        switch (input)
-//        {
-//            case 0x08:
-//                // Also: http://www.ibb.net/~anne/keyboard.html
-//                //
-//                // If a backspace is pressed, you have to send 
-//                // a VT100 erase character sequence as well, to clear the character.
-//                if (index > 0)
-//                {
-//                    serialPort.write(input);           // backspace
-//                    serialPort.print(F("\033\1331\120")); // erase this character
-//                    
-//                    index--;
-//                }
-//                
-//                commandBuffer[index] = 0;
-//                break;
-//            case '\r':
-//            case '\n':
-//                // If a CR / LF was detected in the incoming bytes,
-//                // then move on to command processing.
-//                serialPort.print("\r\n");
-//                newlineFound = true;
-//                break;
-//            default:
-//                if (0x20 <= input && input <= 0x7e &&
-//                    index < sizeof(commandBuffer) - 1) // Limit text entry to (MAX_COMMAND_LENGTH - 1) characters.
-//                {
-//                    // Echo the bytes.
-//                    serialPort.write(input);
-//                    
-//                    commandBuffer[index] = input;
-//                    index++;
-//                }
-//                break;
-//        }
-//
-//    }
-
     commandInputTask.run();
 
     // Read and process commands.
-//    if (millis() % 250 == 0 && newlineFound)
     if (millis() % 250 == 0 && commandInputTask.hasCommand())
     {
-//        String command(commandBuffer);
         String command = commandInputTask.getCommand();
         command.trim();
 
@@ -267,10 +210,5 @@ void loop()
             eepromShell.run(command);
             serialPinShell.run(command);
         }
-
-//        // Reset command input buffer, and indexing.
-//        memset(commandBuffer, 0, sizeof(commandBuffer));
-//        index = 0;
-//        newlineFound = false;
     }
 }
