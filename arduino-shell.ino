@@ -29,6 +29,8 @@
 #include "EepromShellModule.h"
 #include "SerialPinShellModule.h"
 
+#include "Task.h"
+
 // Arduino IDE issue:
 // This include has to remain in place, otherwise for some reason
 // the compiler cannot find it for other .cpp translation units 
@@ -67,6 +69,18 @@ DigitalPinShellModule   digitalPinShell(configBlock, serialPort);
 EepromShellModule       eepromShell(serialPort);
 SerialPinShellModule    serialPinShell(configBlock, serialPort);
 
+class CommandInputTask : public Task
+{
+public:
+    CommandInputTask(String & input) :
+        input(input)
+    {
+        
+    }
+private:
+    String& input;
+};
+
 // -----------------------------------------------------------------------
 // main()
 // -----------------------------------------------------------------------
@@ -103,6 +117,10 @@ void loop()
     static bool    newlineFound = false;
 
     char input;
+
+    String testInput;
+
+    CommandInputTask commandInputTask(testInput);
 
     // Read and echo bytes.
     if (serialPort.available() > 0)
