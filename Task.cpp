@@ -32,7 +32,7 @@ PeriodicTask::PeriodicTask(uint32_t period) :
 {
 }
 
-void PeriodicTask::readyToRun()
+void PeriodicTask::run()
 {
     uint32_t currentTime = millis();
 
@@ -44,7 +44,7 @@ void PeriodicTask::readyToRun()
 
     if (!expectOverflow && currentTime >= runAt)
     {
-        run();
+        main();
 
         runAt += period;
 

@@ -36,8 +36,8 @@ public:
     void start() { runnable = true;  }
     void stop()  { runnable = false; }
 
-    virtual void readyToRun() { run(); }
-    virtual void run() = 0;
+    virtual void run() { main(); }
+    virtual void main() = 0;
 protected:
     bool     runnable        = false;
     uint32_t lastRun         = 0;     //!< When did last run occur, in ms?
@@ -51,7 +51,7 @@ class PeriodicTask : public Task
 public:
     PeriodicTask(uint32_t period);
 
-    void readyToRun();
+    void run();
 private:
     uint32_t runAt;
     uint32_t period;

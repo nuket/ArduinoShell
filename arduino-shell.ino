@@ -72,14 +72,94 @@ SerialPinShellModule    serialPinShell(configBlock, serialPort);
 class CommandInputTask : public Task
 {
 public:
-    CommandInputTask(String & input) :
-        input(input)
+    CommandInputTask(Stream & consolePort) :
+        consolePort(consolePort)
     {
-        
+        clearCommand();
     }
+
+    bool    hasCommand();
+    String  getCommand();
 private:
-    String& input;
+    void    main();
+    void    clearCommand();
+   
+    Stream& consolePort;
+
+    char    commandBuffer[MAX_COMMAND_LENGTH];
+    uint8_t index;
+    bool    newlineFound;
 };
+
+void CommandInputTask::main()
+{
+    char input;
+    
+    // Read and echo bytes.
+    if (consolePort.available() > 0)
+    {
+        input = consolePort.read();
+
+        switch (input)
+        {
+            case 0x08:
+                // Also: http://www.ibb.net/~anne/keyboard.html
+                //
+                // If a backspace is pressed, you have to send 
+                // a VT100 erase character sequence as well, to clear the character.
+                if (index > 0)
+                {
+                    consolePort.write(input);           // backspace
+                    consolePort.print(F("\033\1331\120")); // erase this character
+                    
+                    index--;
+                }
+                
+                commandBuffer[index] = 0;
+                break;
+            case '\r':
+            case '\n':
+                // If a CR / LF was detected in the incoming bytes,
+                // then move on to command processing.
+                consolePort.print("\r\n");
+                newlineFound = true;
+                break;
+            default:
+                if (0x20 <= input && input <= 0x7e &&
+                    index < sizeof(commandBuffer) - 1) // Limit text entry to (MAX_COMMAND_LENGTH - 1) characters.
+                {
+                    // Echo the bytes.
+                    consolePort.write(input);
+                    
+                    commandBuffer[index] = input;
+                    index++;
+                }
+                break;
+        }
+    }
+}
+
+bool CommandInputTask::hasCommand()
+{
+    return newlineFound;
+}
+
+String CommandInputTask::getCommand()
+{
+    String command(commandBuffer);
+    clearCommand();
+    
+    return command;
+}
+
+void CommandInputTask::clearCommand()
+{
+    memset(commandBuffer, '\0', MAX_COMMAND_LENGTH);
+    index = 0;
+    newlineFound = false;
+}
+
+CommandInputTask commandInputTask(serialPort);
 
 // -----------------------------------------------------------------------
 // main()
@@ -110,66 +190,69 @@ void setup()
 
 void loop() 
 {
-    const char TERMINATOR = '\n';
-  
-    static char    commandBuffer[MAX_COMMAND_LENGTH] = {0};
-    static uint8_t index = 0;
-    static bool    newlineFound = false;
+//    const char TERMINATOR = '\n';
+//  
+//    static char    commandBuffer[MAX_COMMAND_LENGTH] = {0};
+//    static uint8_t index = 0;
+//    static bool    newlineFound = false;
+//
+//    char input;
 
-    char input;
+//    String testInput;
+//    testInput.reserve(MAX_COMMAND_LENGTH);
 
-    String testInput;
+//    // Read and echo bytes.
+//    if (serialPort.available() > 0)
+//    {
+//        input = serialPort.read();
+//
+//        switch (input)
+//        {
+//            case 0x08:
+//                // Also: http://www.ibb.net/~anne/keyboard.html
+//                //
+//                // If a backspace is pressed, you have to send 
+//                // a VT100 erase character sequence as well, to clear the character.
+//                if (index > 0)
+//                {
+//                    serialPort.write(input);           // backspace
+//                    serialPort.print(F("\033\1331\120")); // erase this character
+//                    
+//                    index--;
+//                }
+//                
+//                commandBuffer[index] = 0;
+//                break;
+//            case '\r':
+//            case '\n':
+//                // If a CR / LF was detected in the incoming bytes,
+//                // then move on to command processing.
+//                serialPort.print("\r\n");
+//                newlineFound = true;
+//                break;
+//            default:
+//                if (0x20 <= input && input <= 0x7e &&
+//                    index < sizeof(commandBuffer) - 1) // Limit text entry to (MAX_COMMAND_LENGTH - 1) characters.
+//                {
+//                    // Echo the bytes.
+//                    serialPort.write(input);
+//                    
+//                    commandBuffer[index] = input;
+//                    index++;
+//                }
+//                break;
+//        }
+//
+//    }
 
-    CommandInputTask commandInputTask(testInput);
-
-    // Read and echo bytes.
-    if (serialPort.available() > 0)
-    {
-        input = serialPort.read();
-
-        switch (input)
-        {
-            case 0x08:
-                // Also: http://www.ibb.net/~anne/keyboard.html
-                //
-                // If a backspace is pressed, you have to send 
-                // a VT100 erase character sequence as well, to clear the character.
-                if (index > 0)
-                {
-                    serialPort.write(input);           // backspace
-                    serialPort.print(F("\033\1331\120")); // erase this character
-                    
-                    index--;
-                }
-                
-                commandBuffer[index] = 0;
-                break;
-            case '\r':
-            case '\n':
-                // If a CR / LF was detected in the incoming bytes,
-                // then move on to command processing.
-                serialPort.print("\r\n");
-                newlineFound = true;
-                break;
-            default:
-                if (0x20 <= input && input <= 0x7e &&
-                    index < sizeof(commandBuffer) - 1) // Limit text entry to (MAX_COMMAND_LENGTH - 1) characters.
-                {
-                    // Echo the bytes.
-                    serialPort.write(input);
-                    
-                    commandBuffer[index] = input;
-                    index++;
-                }
-                break;
-        }
-
-    }
+    commandInputTask.run();
 
     // Read and process commands.
-    if (millis() % 250 == 0 && newlineFound)
+//    if (millis() % 250 == 0 && newlineFound)
+    if (millis() % 250 == 0 && commandInputTask.hasCommand())
     {
-        String command(commandBuffer);
+//        String command(commandBuffer);
+        String command = commandInputTask.getCommand();
         command.trim();
 
         if (command.equals(F("help")))
@@ -185,9 +268,9 @@ void loop()
             serialPinShell.run(command);
         }
 
-        // Reset command input buffer, and indexing.
-        memset(commandBuffer, 0, sizeof(commandBuffer));
-        index = 0;
-        newlineFound = false;
+//        // Reset command input buffer, and indexing.
+//        memset(commandBuffer, 0, sizeof(commandBuffer));
+//        index = 0;
+//        newlineFound = false;
     }
 }
