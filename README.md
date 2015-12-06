@@ -160,12 +160,8 @@ param[1]: >>10<<
 
 # Building
 
-Make sure to copy the `platform.local.txt` file to the correct Arduino IDE folder, 
-to enable C++11 compilation support. It basically adds the `-std=c++11` option to 
-the AVR gcc compiler command line:
-
-* On Linux, that folder is inside the Arduino IDE directory tree at `arduino-1.6.5-r5/hardware/arduino/avr`. 
-* On Windows and OS X, it's in a similar subfolder.
+Using the latest Arduino 1.6.6 IDE, the project will build with no 
+modifications, as all C++ files are now compiled with `-std=gnu++11`.
 
 # License
 
