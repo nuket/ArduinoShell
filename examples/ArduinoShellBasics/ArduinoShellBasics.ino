@@ -21,19 +21,7 @@
     THE SOFTWARE.
 */
 
-#include "ConfigBlock.h"
-
-#include "AdcPinShellModule.h"
-#include "ConfigShellModule.h"
-#include "DigitalPinShellModule.h"
-#include "EepromShellModule.h"
-#include "SerialPinShellModule.h"
-
-// Arduino IDE issue:
-// This include has to remain in place, otherwise for some reason
-// the compiler cannot find it for other .cpp translation units 
-// that rely on it. :(
-#include <EEPROM.h>
+#include <ArduinoShell.h>
 
 // -----------------------------------------------------------------------
 // Flash-free defines.
@@ -82,7 +70,7 @@ void help()
 
 void setup() 
 {
-    serialPort.begin(115200);
+    serialPort.begin(57600);
 
     serialPort.println(F("Arduino Shell"));
     serialPort.println(F("Copyright (c) 2015 Max Vilimpoc (https://github.com/nuket/arduino-shell), MIT licensed.\n"));
