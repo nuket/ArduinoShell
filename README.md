@@ -24,6 +24,10 @@ next steps.
 6. Type `pin 13 high` and press Return. The built-in LED on the Arduino should light up.
 7. Type `pin 13 low`  and press Return. The built-in LED on the Arduino should turn off.
 
+## Example
+
+![Screencast](screencast.gif)
+
 ## Startup
 
 At startup, the saved pin configuration is reloaded and digital I/O pins are restored
