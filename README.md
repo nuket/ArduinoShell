@@ -18,10 +18,11 @@ next steps.
 
 1. `cd arduino-1.6.7/hardware/arduino/avr/libraries`
 2. `git clone git@github.com:nuket/ArduinoShell.git`
-3. Run the ArduinoShellBasics example
-4. Open the Serial Monitor, set it to 57600 baud, with Newline line endings.
-5. Type `pin 13 high` and press Return. The built-in LED on the Arduino should light up.
-6. Type `pin 13 low`  and press Return. The built-in LED on the Arduino should turn off.
+3. Start/restart the Arduino IDE.
+4. Run the ArduinoShellBasics example
+5. Open the Serial Monitor, set it to 57600 baud, with Newline line endings.
+6. Type `pin 13 high` and press Return. The built-in LED on the Arduino should light up.
+7. Type `pin 13 low`  and press Return. The built-in LED on the Arduino should turn off.
 
 ## Startup
 
