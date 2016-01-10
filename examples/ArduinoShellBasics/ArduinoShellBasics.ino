@@ -27,7 +27,8 @@
 // Flash-free defines.
 // -----------------------------------------------------------------------
 
-#define MAX_COMMAND_LENGTH 20
+#define COMMAND_PROCESS_INTERVAL 250  //!< Process commands every 250ms.
+#define MAX_COMMAND_LENGTH       20   //!< Commands can be this long.
 
 // -----------------------------------------------------------------------
 // Imports
@@ -86,9 +87,11 @@ void loop()
 {
     const char TERMINATOR = '\n';
   
-    static char    commandBuffer[MAX_COMMAND_LENGTH] = {0};
-    static uint8_t index = 0;
-    static bool    newlineFound = false;
+    static char     commandBuffer[MAX_COMMAND_LENGTH] = {0};
+    static uint8_t  index = 0;
+    static bool     newlineFound = false;
+
+    static uint32_t processNextCommand = millis() + COMMAND_PROCESS_INTERVAL;
 
     char input;
 
@@ -137,7 +140,7 @@ void loop()
     }
 
     // Read and process commands.
-    if (millis() % 250 == 0 && newlineFound)
+    if (millis() > processNextCommand && newlineFound)
     {
         String command(commandBuffer);
         command.trim();
@@ -159,5 +162,7 @@ void loop()
         memset(commandBuffer, 0, sizeof(commandBuffer));
         index = 0;
         newlineFound = false;
+
+        processNextCommand += COMMAND_PROCESS_INTERVAL;
     }
 }
