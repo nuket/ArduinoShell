@@ -1,10 +1,12 @@
-ConfigBlock
-AdcPinShellModule
-CommandAndParams
-ConfigBlock
-ConfigShellModule
-DigitalPinShellModule
-EepromShellModule
-SerialPinShellModule
-ShellModule
+ArduinoShell	KEYWORD1
+
+ConfigBlock	KEYWORD1
+AdcPinShellModule	KEYWORD1
+CommandAndParams	KEYWORD1
+ConfigBlock	KEYWORD1
+ConfigShellModule	KEYWORD1
+DigitalPinShellModule	KEYWORD1
+EepromShellModule	KEYWORD1
+SerialPinShellModule	KEYWORD1
+ShellModule	KEYWORD1
 
